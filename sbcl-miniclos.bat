@@ -3,4 +3,5 @@ sbcl --noinform ^
 --load utils/miniclos/miniclos.lisp ^
 --eval "(in-package :closless)" ^
 --load src/macros/class.lisp ^
+--load src/functions/instance.lisp ^
 %*
