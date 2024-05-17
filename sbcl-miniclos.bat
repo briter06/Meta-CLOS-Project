@@ -1,7 +1,7 @@
 sbcl --noinform ^
---load utils/miniclos/closless.lisp ^
---load utils/miniclos/miniclos.lisp ^
+--load miniclos/closless.lisp ^
+--load miniclos/miniclos.lisp ^
 --eval "(in-package :closless)" ^
---load src/macros/class.lisp ^
---load src/functions/instance.lisp ^
+--load src/macros/macros.lisp ^
+--load src/functions/functions.lisp ^
 %*
