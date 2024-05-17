@@ -1,0 +1,1 @@
+(load "src/tests/precedence-list.lisp")

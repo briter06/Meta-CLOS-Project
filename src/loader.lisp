@@ -1,10 +1,6 @@
 (load "src/macros/macros.lisp")
 (load "src/functions/functions.lisp")
 
-; Tests
-
-(load "src/tests/precedence-list.lisp")
-
 ; ; (defvar person
 ; ;     (make-class :direct-slots '(name age)))
 
