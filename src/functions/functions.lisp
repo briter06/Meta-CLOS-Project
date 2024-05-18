@@ -1,4 +1,5 @@
 (in-package :closless)
+(load "src/utils/sets.lisp")
 
 (defun generate-class-symbol-set (class)
   (adjoin (class-name-symbol class) (mapcar #'class-name-symbol (class-all-superclasses class))))
@@ -25,4 +26,19 @@
 (defun classes-not-preceded (s r)
   (remove-if (lambda (symbol) (is-preceded symbol r)) s))
 
-; (classes-not-preceded (generate-class-symbol-set pie) (generate-class-symbol-relation-set pie))
+(defun remove-apperance-of-class (symbol r)
+  (remove-if (lambda (tuple) (or (eql (car tuple) symbol) (eql (cadr tuple) symbol))) r))
+
+(defun precedence-list-accumulator (s r acc)
+  (let ((classes-not-preceded (classes-not-preceded s r)))
+    (cond
+     ((eql (length classes-not-preceded) 0) acc)
+     ((eql (length classes-not-preceded) 1)
+       (let ((elem (car classes-not-preceded)))
+         (precedence-list-accumulator (remove-from-set elem s) (remove-apperance-of-class elem r) (cons elem acc))))
+     (t (error "Not implemented yet")))))
+
+(defun class-precedence-list (class)
+  (reverse (cons 't (precedence-list-accumulator (generate-class-symbol-set class) (generate-class-symbol-relation-set class) '()))))
+
+; (class-precedence-list (find-class 'pie))

@@ -4,3 +4,4 @@
 (defclass cinnamon (spice) ())
 (defclass apple (fruit) ()) 
 (defclass pie (apple cinnamon) ()) 
+; (defclass pie (apple) ()) 
