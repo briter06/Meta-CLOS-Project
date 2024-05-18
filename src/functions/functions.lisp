@@ -29,14 +29,23 @@
 (defun remove-apperance-of-class (symbol r)
   (remove-if (lambda (tuple) (or (eql (car tuple) symbol) (eql (cadr tuple) symbol))) r))
 
+(defun get-superclass-of-subclass-in-list (class candidates)
+  (loop for c in candidates when (subclassp class (find-class c)) do (return c) finally (return nil)))
+
+(defun detect-superclass (candidates acc)
+  (cond
+   ((eql (length candidates) 1) (car candidates))
+   ((eql (length acc) 0) (error "TODO error"))
+   (t (let ((superclass (get-superclass-of-subclass-in-list (find-class (car acc)) candidates)))
+        (or superclass (detect-superclass candidates (cdr acc)))))))
+
 (defun precedence-list-accumulator (s r acc)
-  (let ((classes-not-preceded (classes-not-preceded s r)))
+  (let ((candidates (classes-not-preceded s r)))
     (cond
-     ((eql (length classes-not-preceded) 0) acc)
-     ((eql (length classes-not-preceded) 1)
-       (let ((elem (car classes-not-preceded)))
-         (precedence-list-accumulator (remove-from-set elem s) (remove-apperance-of-class elem r) (cons elem acc))))
-     (t (error "Not implemented yet")))))
+     ((eql (length candidates) 0) acc)
+     (t
+       (let ((elem (detect-superclass candidates acc)))
+         (precedence-list-accumulator (remove-from-set elem s) (remove-apperance-of-class elem r) (cons elem acc)))))))
 
 (defun class-precedence-list (class)
   (reverse (cons 't (precedence-list-accumulator (generate-class-symbol-set class) (generate-class-symbol-relation-set class) '()))))
