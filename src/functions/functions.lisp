@@ -18,3 +18,11 @@
                   (concat-sets (generate-class-symbol-relation-set (find-class x)) acc :test #'equal-setp))
             symbols
           :initial-value (adjoin (list (class-name-symbol class) (car symbols)) (get-couples symbols) :test #'equal-setp))))))
+
+(defun is-preceded (class-symbol r)
+  (loop for tuple in r when (eql (cadr tuple) class-symbol) do (return t) finally (return nil)))
+
+(defun classes-not-preceded (s r)
+  (remove-if (lambda (symbol) (is-preceded symbol r)) s))
+
+; (classes-not-preceded (generate-class-symbol-set pie) (generate-class-symbol-relation-set pie))
