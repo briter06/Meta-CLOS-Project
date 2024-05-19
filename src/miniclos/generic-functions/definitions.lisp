@@ -15,40 +15,30 @@
   (specializers '())
   (function (error "No method function provided.")))
 
-(defun find-method (accessor gf specializers)
-  (loop for method in (funcall accessor gf)
+(defun find-method (method-list specializers)
+  (loop for method in method-list
           when (equal specializers (method-specializers method))
           return method))
 
-(defun remove-method (gf method)
-  (setf (generic-function-methods gf)
-    (remove method (generic-function-methods gf))))
+(defmacro remove-method (method-list method)
+  `(setf ,method-list
+    (remove ,method ,method-list)))
 
-(defun remove-before-method (gf method)
-  (setf (generic-function-before-methods gf)
-    (remove method (generic-function-before-methods gf))))
-
-(defun remove-after-method (gf method)
-  (setf (generic-function-after-methods gf)
-    (remove method (generic-function-after-methods gf))))
+(defmacro add-method-helper (method-list method)
+  `(progn
+      (let ((old-method (find-method ,method-list (method-specializers ,method))))
+        (when old-method
+              (remove-method ,method-list old-method)))
+      (push ,method ,method-list)))
 
 (defun add-method (gf method)
-  (let ((old-method (find-method #'generic-function-methods gf (method-specializers method))))
-    (when old-method
-          (remove-method gf old-method)))
-  (push method (generic-function-methods gf)))
+  (add-method-helper (generic-function-methods gf) method))
 
 (defun add-before-method (gf method)
-  (let ((old-method (find-method #'generic-function-before-methods gf (method-specializers method))))
-    (when old-method
-          (remove-before-method gf old-method)))
-  (push method (generic-function-before-methods gf)))
+  (add-method-helper (generic-function-before-methods gf) method))
 
 (defun add-after-method (gf method)
-  (let ((old-method (find-method #'generic-function-after-methods gf (method-specializers method))))
-    (when old-method
-          (remove-before-method gf old-method)))
-  (push method (generic-function-after-methods gf)))
+  (add-method-helper (generic-function-after-methods gf) method))
 
 (defun compute-applicable-methods (methods arguments)
   (loop for method in methods
