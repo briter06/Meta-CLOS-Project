@@ -18,24 +18,22 @@
 
 (add-method display
             (make-method
-             :specializer person
-             :function (lambda (receiver other-args next-methods)
+             :specializers (list person)
+             :function (lambda (arguments next-methods)
                          (declare (ignore next-methods))
-                         (declare (ignore other-args))
-                         (print (slot-value receiver 'name))
-                         (print (slot-value receiver 'address)))))
+                         (print (slot-value (car arguments) 'name))
+                         (print (slot-value (car arguments) 'address)))))
 
 (add-method display
             (make-method
-             :specializer employee
-             :function (lambda (receiver other-args next-methods)
+             :specializers (list employee)
+             :function (lambda (arguments next-methods)
                          (let ((next-most-specific-method
-                                (select-most-specific-method next-methods)))
+                                (select-most-specific-method arguments next-methods)))
                            (funcall (method-function next-most-specific-method)
-                                    receiver
-                                    other-args
-                                    (remove next-most-specific-method next-methods)))
-                         (print (slot-value receiver 'employer)))))
+                             arguments
+                             (remove next-most-specific-method next-methods)))
+                         (print (slot-value (car arguments) 'employer)))))
 
 (call-generic-function display p)
 (call-generic-function display e)
