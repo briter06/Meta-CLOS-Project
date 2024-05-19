@@ -24,7 +24,7 @@
                                 :function (lambda (,lambda-arguments ,lambda-next-methods)
                                             (declare (ignore ,lambda-next-methods))
                                             (let ,(loop for name in (car args-mapper) for index from 0 collect `(,name (nth ,index ,lambda-arguments)))
-                                              ,(cons 'progn body))))))))
+                                              (labels ((call-next-method () (print "Called"))) ,(cons 'progn body)))))))))
 
 
-; (print (macroexpand '(defmethod display ((person-obj person)) (print (slot-value person-obj 'name)))))
+; (macroexpand '(defmethod display ((person-obj person)) (print (slot-value person-obj 'name))))

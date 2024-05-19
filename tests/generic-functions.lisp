@@ -26,7 +26,8 @@
 
 (defmethod display ((person-obj person))
   (print (slot-value person-obj 'name))
-  (print (slot-value person-obj 'address)))
+  (print (slot-value person-obj 'address))
+  (call-next-method))
 
 ; (add-method display
 ;             (make-method
