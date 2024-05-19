@@ -11,7 +11,7 @@
 (defclass dog-food (food) ())
 (defclass cat-food (food) ())
 
-(defgeneric eat)
+(defgeneric eat (animal food))
 
 (defmethod eat ((animal dog) (food dog-food))
     "I like dog food!")

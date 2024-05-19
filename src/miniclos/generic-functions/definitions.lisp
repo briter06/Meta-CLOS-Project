@@ -2,8 +2,12 @@
 (load "src/utils/lists.lisp")
 (load "src/miniclos/precedence-list/precedence-list.lisp")
 
+(define-condition generic-function-error (error)
+    ((message :initarg :message :reader message)))
+
 (defstruct generic-function
-  (methods '()))
+  (methods '())
+  (num-args 0))
 
 (defstruct method
   (specializers '())
@@ -26,7 +30,6 @@
 
 (defun compute-applicable-methods (gf arguments)
   (loop for method in (generic-function-methods gf)
-          ; when (instancep receiver (method-specializer method))
           when (let ((specializers (method-specializers method)))
                  (and (eql (length specializers) (length arguments))
                       (every (lambda (s) (instancep (cadr s) (car s))) (zip specializers arguments))))
@@ -38,18 +41,6 @@
 
 (defun is-more-specific-list? (arguments specializers1 specializers2)
   (some (lambda (tuple) (is-more-specific? (object-class (first tuple)) (second tuple) (third tuple))) (zip3 arguments specializers1 specializers2)))
-
-#|
-(defclass food () ())
-(defclass spice (food) ())
-(defclass fruit (food) ())
-(defclass cinnamon (spice) ())
-(defclass apple (fruit) ())
-(defclass pie (apple cinnamon) ())
-
-(defvar pie-instance (make-instance 'pie))
-(is-more-specific-list? (list pie-instance) (list apple) (list food))
-|#
 
 (defun select-most-specific-method (arguments methods)
   (loop with candidate = (first methods)
