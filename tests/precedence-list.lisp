@@ -19,7 +19,7 @@
 (assert-equals (class-precedence-list (find-class 'cinnamon)) '(cinnamon spice food *object* t))
 (assert-equals (class-precedence-list (find-class 'food)) '(food *object* t))
 
-(unbound-classes (pie apple cinnamon fruit spice food))
+(unbound-variables (pie apple cinnamon fruit spice food))
 
 ; Scenario 2
 
@@ -31,7 +31,7 @@
 (assert-equals (class-precedence-list (find-class 'pie)) '(pie apple cinnamon *object* t))
 (assert-equals (class-precedence-list (find-class 'pastry)) '(pastry cinnamon apple *object* t))
 
-(unbound-classes (pie pastry apple cinnamon))
+(unbound-variables (pie pastry apple cinnamon))
 
 ; Scenario 3
 
@@ -42,7 +42,7 @@
 
 (assert-should-raise (class-precedence-list (find-class 'new-class)) predecence-list-error "There is a cycle in the precedence list")
 
-(unbound-classes (new-class apple fruit food))
+(unbound-variables (new-class apple fruit food))
 
 ; Scenario 4
 
@@ -58,7 +58,7 @@
 
 (assert-equals (class-precedence-list (find-class 'S1)) '(S1 S2 L1 L2 M1 R1 R2 R3 J *object* t))
 
-(unbound-classes (S1 S2 L1 L2 M1 R1 R2 R3 J))
+(unbound-variables (S1 S2 L1 L2 M1 R1 R2 R3 J))
 
 ; Scenario 5
 (defclass A () ())
@@ -80,6 +80,6 @@
 
 (assert-equals (class-precedence-list (find-class 'K)) '(K I G E B J H F C D A *object* t))
 
-(unbound-classes (K I G E B J H F C D A))
+(unbound-variables (K I G E B J H F C D A))
 
-(print "All the tests passed")
+(print "Precedence List => All the tests passed")

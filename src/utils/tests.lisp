@@ -12,5 +12,5 @@
      (:no-error (res) (declare (ignore res))
                 (error (format nil "Assert error in (assert-should-raise ~d ~d ~d) | Execution did not raise any errors" ',x ',error-type ',error-message)))))
 
-(defmacro unbound-classes (classes)
-  (loop for class in classes do (makunbound class) finally (return t)))
+(defmacro unbound-variables (variables)
+  (loop for variable in variables do (makunbound variable) finally (return t)))

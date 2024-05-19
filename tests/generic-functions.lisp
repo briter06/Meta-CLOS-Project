@@ -2,6 +2,8 @@
 (load "src/utils/tests.lisp")
 (load "src/miniclos/loader.lisp")
 
+;; Scenario 1 | Simple dispatch
+
 (defclass person () (name address))
 (defclass employee (person) (employer))
 
@@ -17,12 +19,14 @@
 (defgeneric display)
 
 (defmethod display ((person-obj person))
-  (print (slot-value person-obj 'name))
-  (print (slot-value person-obj 'address)))
+  `(,(slot-value person-obj 'name) ,(slot-value person-obj 'address)))
 
 (defmethod display ((employee-obj employee))
-  (call-next-method)
-  (print (slot-value employee-obj 'employer)))
+  (cons (slot-value employee-obj 'employer) (call-next-method)))
 
-(call-generic-function display p)
-(call-generic-function display e)
+(assert-equals (call-generic-function display p) '("Briter" "Brussels"))
+(assert-equals (call-generic-function display e) '("VUB" "Andres" "Ghent"))
+
+(unbound-variables (person employee p e display))
+
+(print "Generic Functions => All the tests passed")
