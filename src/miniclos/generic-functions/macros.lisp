@@ -1,4 +1,5 @@
 (in-package :closless)
+(load "src/miniclos/classes/definitions.lisp")
 (load "src/utils/lists.lisp")
 (load "src/utils/with-gensyms.lisp")
 
@@ -10,7 +11,7 @@
 (defun extract-specializers-variables (arguments)
   (reduce (lambda (acc tuple)
             (if (listp tuple)
-                `(,(cons (car tuple) (car acc)) ,(cons (cadr tuple) (cadr acc)))
+                `(,(cons (car tuple) (car acc)) ,(cons (mangle-class-name (cadr tuple)) (cadr acc)))
                 `(,(cons tuple (car acc)) ,(cons '*object* (cadr acc)))))
       (reverse arguments) :initial-value '(() ())))
 
@@ -36,6 +37,7 @@
                                (make-method
                                 :specializers ,(cons 'list (cadr args-mapper))
                                 :function (lambda (,lambda-arguments ,lambda-next-methods)
-                                            (let ,(loop for variable-name in (car args-mapper) for index from 0 collect `(,variable-name (nth ,index ,lambda-arguments)))
-                                              (labels ((call-next-method () ,(next-method-helper lambda-arguments lambda-next-methods)))
-                                                ,(cons 'progn body)))))))))))
+                                            (labels ((call-next-method () ,(next-method-helper lambda-arguments lambda-next-methods)))
+                                              ,(append
+                                                `(let ,(loop for variable-name in (car args-mapper) for index from 0 collect `(,variable-name (nth ,index ,lambda-arguments))))
+                                                body))))))))))

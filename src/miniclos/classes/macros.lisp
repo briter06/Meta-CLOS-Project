@@ -1,5 +1,8 @@
 (in-package :closless)
 
 (defmacro defclass (name superclasses slots)
-  `(defvar ,name
-           (make-class :name-symbol ',name :direct-superclasses (append ,(cons 'list superclasses) (list *object*)) :direct-slots ',slots)))
+  `(defvar ,(mangle-class-name name)
+           (make-class
+            :name-symbol ',(mangle-class-name name)
+            :direct-superclasses (append ,(cons 'list (mapcar #'mangle-class-name superclasses)) (list *object*))
+            :direct-slots ',slots)))

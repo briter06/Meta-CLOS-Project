@@ -29,6 +29,6 @@
 (assert-equals (display p) '("Briter" "Brussels"))
 (assert-equals (display e) '("VUB" "Andres" "Ghent"))
 
-(unbound-variables (person employee p e display))
+(unbound-variables '(<person> <employee> p e display))
 
 (print "Generic Functions => All the tests passed")

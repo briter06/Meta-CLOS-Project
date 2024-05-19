@@ -3,6 +3,11 @@
 
 (defvar *object*)
 
+(defun mangle-class-name (class-symbol)
+  (cond
+    ((eql class-symbol '*object*) class-symbol)
+    (t (intern (concatenate 'string "<" (string class-symbol) ">")))))
+
 (defstruct class
   (name-symbol nil)
   (direct-superclasses (list *object*))
@@ -33,10 +38,10 @@
     value))
 
 (defun make-instance (class)
-  (make-object :class (symbol-value class)))
+  (make-object :class (symbol-value (mangle-class-name class))))
 
 (defun find-class (class-symbol)
-  (symbol-value class-symbol))
+  (symbol-value (mangle-class-name class-symbol)))
 
 (defun instancep (object class)
   (subclassp (object-class object) class))
