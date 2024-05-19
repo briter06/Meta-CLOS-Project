@@ -8,6 +8,7 @@
 (defstruct generic-function
   (methods '())
   (before-methods '())
+  (after-methods '())
   (num-args 0))
 
 (defstruct method
@@ -27,6 +28,10 @@
   (setf (generic-function-before-methods gf)
     (remove method (generic-function-before-methods gf))))
 
+(defun remove-after-method (gf method)
+  (setf (generic-function-after-methods gf)
+    (remove method (generic-function-after-methods gf))))
+
 (defun add-method (gf method)
   (let ((old-method (find-method #'generic-function-methods gf (method-specializers method))))
     (when old-method
@@ -38,6 +43,12 @@
     (when old-method
           (remove-before-method gf old-method)))
   (push method (generic-function-before-methods gf)))
+
+(defun add-after-method (gf method)
+  (let ((old-method (find-method #'generic-function-after-methods gf (method-specializers method))))
+    (when old-method
+          (remove-before-method gf old-method)))
+  (push method (generic-function-after-methods gf)))
 
 (defun compute-applicable-methods (methods arguments)
   (loop for method in methods
@@ -73,4 +84,7 @@
 (defun call-generic-function (gf &rest arguments)
   (when (generic-function-before-methods gf)
     (call-generic-function-helper (generic-function-before-methods gf) arguments))
-  (call-generic-function-helper (generic-function-methods gf) arguments))
+  (let ((result (call-generic-function-helper (generic-function-methods gf) arguments)))
+    (when (generic-function-after-methods gf)
+      (call-generic-function-helper (generic-function-after-methods gf) arguments))
+    result))

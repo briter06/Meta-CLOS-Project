@@ -15,14 +15,20 @@
 (defmethod greet :before ((o person))
     (declare (ignore o))
     (setf logger (append logger '("I'm a person"))))
-; (defmethod greet :after ((o person)) (print "Bye person"))
+(defmethod greet :after ((o person))
+    (declare (ignore o))
+    (setf logger (append logger '("Bye person"))))
 
 (defmethod greet :before ((o student))
     (declare (ignore o))
     (setf logger (append logger '("I'm a student"))))
-; (defmethod greet :after ((o student)) (print "Bye student"))
+(defmethod greet :after ((o student))
+    (declare (ignore o))
+    (setf logger (append logger '("Bye student"))))
 
 (assert-equals (greet (make-instance 'student)) "Student - Main")
-(assert-equals logger '("I'm a student" "I'm a person"))
+(assert-equals logger '("I'm a student" "I'm a person" "Bye person" "Bye student"))
 
-(unbound-variables '(<person> <student> greet))
+(unbound-variables '(<person> <student> greet logger))
+
+(print "Auxiliary Methods => All the tests passed")

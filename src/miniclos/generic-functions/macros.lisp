@@ -55,13 +55,27 @@
                       `(lambda (,lambda-arguments ,lambda-next-methods)
                         ,(append
                           `(let ,(loop for variable-name in (car args-mapper) for index from 0 collect `(,variable-name (nth ,index ,lambda-arguments))))
-                          body `((when ,lambda-next-methods ,(next-method-helper lambda-arguments lambda-next-methods)))))))))))
+                          body)
+                          (when ,lambda-next-methods ,(next-method-helper lambda-arguments lambda-next-methods)))))))))
+
+(defun defmethod-after (name arguments body)
+  (defmethod-helper name arguments
+      (let ((args-mapper (extract-specializers-variables arguments)))
+        `(add-after-method ,name
+          (make-method
+          :specializers ,(cons 'list (cadr args-mapper))
+          :function ,(with-gensyms (lambda-arguments lambda-next-methods)
+                      `(lambda (,lambda-arguments ,lambda-next-methods)
+                        (when ,lambda-next-methods ,(next-method-helper lambda-arguments lambda-next-methods))
+                        ,(append
+                          `(let ,(loop for variable-name in (car args-mapper) for index from 0 collect `(,variable-name (nth ,index ,lambda-arguments))))
+                          body))))))))
 
 (defmacro defmethod (name &rest all-arguments)
   (let ((first (car all-arguments))
         (rest (cdr all-arguments)))
     (cond
       ((eql first ':before) (defmethod-before name (car rest) (cdr rest)))
-      ((eql first ':after) (error "Not implemented yet"))
+      ((eql first ':after) (defmethod-after name (car rest) (cdr rest)))
       ((eql first ':around) (error "Not implemented yet"))
       (t (defmethod-normal name first rest)))))
