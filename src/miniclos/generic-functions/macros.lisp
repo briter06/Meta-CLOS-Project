@@ -28,22 +28,25 @@
   (let ((new-num-args (length arguments))
         (num-args (generic-function-num-args (symbol-value name)))
         (args-mapper (extract-specializers-variables arguments)))
-    (with-gensyms (lambda-arguments lambda-next-methods)
-                  (cond
-                    ((not (eql new-num-args num-args))
-                      `(error 'generic-function-error :message (format nil "Invalid number of arguments: ~d" ,new-num-args)))
-                    (t
-                      `(add-method ,name
-                               (make-method
-                                :specializers ,(cons 'list (cadr args-mapper))
-                                :function (lambda (,lambda-arguments ,lambda-next-methods)
-                                            (labels ((call-next-method () ,(next-method-helper lambda-arguments lambda-next-methods)))
-                                              ,(append
-                                                `(let ,(loop for variable-name in (car args-mapper) for index from 0 collect `(,variable-name (nth ,index ,lambda-arguments))))
-                                                body))))))))))
+          (cond
+            ((not (eql new-num-args num-args))
+              `(error 'generic-function-error :message (format nil "Invalid number of arguments: ~d" ,new-num-args)))
+            (t
+              `(add-method ,name
+                        (make-method
+                        :specializers ,(cons 'list (cadr args-mapper))
+                        :function ,(with-gensyms (lambda-arguments lambda-next-methods)
+                                    `(lambda (,lambda-arguments ,lambda-next-methods)
+                                      (labels ((call-next-method () ,(next-method-helper lambda-arguments lambda-next-methods)))
+                                        ,(append
+                                          `(let ,(loop for variable-name in (car args-mapper) for index from 0 collect `(,variable-name (nth ,index ,lambda-arguments))))
+                                          body))))))))))
 
 (defmacro defmethod (name &rest all-arguments)
   (let ((first (car all-arguments))
         (rest (cdr all-arguments)))
     (cond
+      ((eql first ':before) (error "Not implemented yet"))
+      ((eql first ':after) (error "Not implemented yet"))
+      ((eql first ':around) (error "Not implemented yet"))
       (t (defmethod-normal name first rest)))))
