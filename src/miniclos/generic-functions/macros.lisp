@@ -24,7 +24,7 @@
             (remove ,next-most-specific-method ,next-methods))
           (error 'generic-function-error :message "There is no available next method")))))
 
-(defmacro defmethod (name arguments &rest body)
+(defun defmethod-normal (name arguments body)
   (let ((new-num-args (length arguments))
         (num-args (generic-function-num-args (symbol-value name)))
         (args-mapper (extract-specializers-variables arguments)))
@@ -41,3 +41,9 @@
                                               ,(append
                                                 `(let ,(loop for variable-name in (car args-mapper) for index from 0 collect `(,variable-name (nth ,index ,lambda-arguments))))
                                                 body))))))))))
+
+(defmacro defmethod (name &rest all-arguments)
+  (let ((first (car all-arguments))
+        (rest (cdr all-arguments)))
+    (cond
+      (t (defmethod-normal name first rest)))))
