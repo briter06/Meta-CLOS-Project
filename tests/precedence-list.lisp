@@ -1,5 +1,5 @@
 (load "src/utils/tests.lisp")
-(load "src/loader.lisp")
+(load "src/miniclos/loader.lisp")
 
 
 (assert-equals (class-precedence-list (find-class '*object*)) '(*object* t))
