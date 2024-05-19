@@ -24,8 +24,8 @@
 (defmethod display ((employee-obj employee))
   (cons (slot-value employee-obj 'employer) (call-next-method)))
 
-(assert-equals (call-generic-function display p) '("Briter" "Brussels"))
-(assert-equals (call-generic-function display e) '("VUB" "Andres" "Ghent"))
+(assert-equals (display p) '("Briter" "Brussels"))
+(assert-equals (display e) '("VUB" "Andres" "Ghent"))
 
 (unbound-variables (person employee p e display))
 

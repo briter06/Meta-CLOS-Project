@@ -6,7 +6,9 @@
     ((message :initarg :message :reader message)))
 
 (defmacro defgeneric (name)
-  `(defvar ,name (make-generic-function)))
+  `(progn
+      (defvar ,name (make-generic-function))
+      (defun ,name (&rest arguments) (apply #'call-generic-function (cons ,name arguments)))))
 
 (defun extract-specializers-variables (arguments)
   (reduce (lambda (acc tuple)
@@ -31,7 +33,7 @@
                                (make-method
                                 :specializers ,(cons 'list (cadr args-mapper))
                                 :function (lambda (,lambda-arguments ,lambda-next-methods)
-                                            (let ,(loop for name in (car args-mapper) for index from 0 collect `(,name (nth ,index ,lambda-arguments)))
+                                            (let ,(loop for variable-name in (car args-mapper) for index from 0 collect `(,variable-name (nth ,index ,lambda-arguments)))
                                               (labels ((call-next-method () ,(next-method-helper lambda-arguments lambda-next-methods)))
                                                 ,(cons 'progn body)))))))))
 
