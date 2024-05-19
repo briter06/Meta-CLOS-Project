@@ -18,13 +18,13 @@
 
 (defgeneric display (object))
 
-(assert-should-raise (defmethod display ((person-obj person) arg2) t) generic-function-error "Invalid number of arguments: 2")
+(assert-should-raise (defmethod display ((person person) arg2) t) generic-function-error "Invalid number of arguments: 2")
 
-(defmethod display ((person-obj person))
-  `(,(slot-value person-obj 'name) ,(slot-value person-obj 'address)))
+(defmethod display ((person person))
+  `(,(slot-value person 'name) ,(slot-value person 'address)))
 
-(defmethod display ((employee-obj employee))
-  (cons (slot-value employee-obj 'employer) (call-next-method)))
+(defmethod display ((employee employee))
+  (cons (slot-value employee 'employer) (call-next-method)))
 
 (assert-equals (display p) '("Briter" "Brussels"))
 (assert-equals (display e) '("VUB" "Andres" "Ghent"))

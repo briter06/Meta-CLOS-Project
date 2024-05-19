@@ -23,10 +23,15 @@
 (defmethod greet ((p PhDStudent))
     (concatenate 'string "Let's research! " (call-next-method)))
 
-(defvar phdstudent-obj (make-instance 'PhDStudent))
-(defvar person-obj (make-instance 'Person))
-(defvar staff-obj (make-instance 'Staff))
+(defvar phdstudent (make-instance 'PhDStudent))
+(defvar person (make-instance 'Person))
+(defvar staff (make-instance 'Staff))
 
-; (unbound-variables (Person Staff Student PhDStudent study greet phdstudent person staff))
+(assert-equals (study phdstudent) "Let's study.")
+(assert-equals (study person) "I'm not a student.")
+(assert-equals (study staff) "I work with students, but I'm not a student.")
+(assert-equals (greet phdstudent) "Let's research! Deadlines? Deadlines! Time is ticking. How are you?")
+
+(unbound-variables '(<Person> <Staff> <Student> <PhDStudent> study greet phdstudent person staff))
 
 (print "Generic Functions | Multiple Inheritance | Assignment example => All the tests passed")
