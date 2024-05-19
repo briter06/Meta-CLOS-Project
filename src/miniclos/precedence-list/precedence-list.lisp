@@ -7,7 +7,7 @@
     ((message :initarg :message :reader message)))
 
 (defun generate-class-symbol-set (class)
-  (adjoin (class-name-symbol class) (mapcar #'class-name-symbol (class-all-superclasses class))))
+  (mapcar #'class-name-symbol (class-all-superclasses class)))
 
 (defun get-couples (elems)
   (cond
@@ -21,7 +21,7 @@
      (t (reduce (lambda (acc x)
                   (concat-sets (generate-class-symbol-relation-set (symbol-value x)) acc :test #'equal))
             symbols
-          :initial-value (adjoin (list (class-name-symbol class) (car symbols)) (get-couples symbols) :test #'equal))))))
+          :initial-value (get-couples (cons (class-name-symbol class) (if (equal symbols '(*object*)) symbols (append symbols '(*object*))))))))))
 
 (defun is-preceded (class-symbol r)
   (loop for tuple in r when (eql (cadr tuple) class-symbol) do (return t) finally (return nil)))
@@ -33,8 +33,7 @@
   (remove-if (lambda (tuple) (or (eql (car tuple) symbol) (eql (cadr tuple) symbol))) r))
 
 (defun get-superclass-of-subclass-in-list (class candidates)
-  ;; TODO -> DIRECT SUBCLASS
-  (loop for c in candidates when (subclassp class (symbol-value c)) do (return c) finally (return nil)))
+  (loop for c in candidates when (direct-subclassp class (symbol-value c)) do (return c) finally (return nil)))
 
 (defun detect-superclass (candidates acc)
   (cond

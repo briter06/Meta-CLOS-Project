@@ -26,6 +26,9 @@
 (defun subclassp (class1 class2)
   (member class2 (class-all-superclasses class1)))
 
+(defun direct-subclassp (class1 class2)
+  (member class2 (class-direct-superclasses class1)))
+
 (defstruct object
   (class *object*)
   (slots (make-hash-table)))

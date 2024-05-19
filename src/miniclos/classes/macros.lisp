@@ -4,5 +4,5 @@
   `(defvar ,(mangle-class-name name)
            (make-class
             :name-symbol ',(mangle-class-name name)
-            :direct-superclasses (append ,(cons 'list (mapcar #'mangle-class-name superclasses)) (list *object*))
+            :direct-superclasses ,(if superclasses (cons 'list (mapcar #'mangle-class-name superclasses)) '(list *object*))
             :direct-slots ',slots)))
