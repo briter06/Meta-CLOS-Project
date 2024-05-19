@@ -13,8 +13,8 @@
   (specializers '())
   (function (error "No method function provided.")))
 
-(defun find-method (gf specializers)
-  (loop for method in (generic-function-methods gf)
+(defun find-method (accessor gf specializers)
+  (loop for method in (funcall accessor gf)
           when (equal specializers (method-specializers method))
           return method))
 
@@ -23,13 +23,13 @@
     (remove method (generic-function-methods gf))))
 
 (defun add-method (gf method)
-  (let ((old-method (find-method gf (method-specializers method))))
+  (let ((old-method (find-method #'generic-function-methods gf (method-specializers method))))
     (when old-method
           (remove-method gf old-method)))
   (push method (generic-function-methods gf)))
 
-(defun compute-applicable-methods (gf arguments)
-  (loop for method in (generic-function-methods gf)
+(defun compute-applicable-methods (methods arguments)
+  (loop for method in methods
           when (let ((specializers (method-specializers method)))
                  (and (eql (length specializers) (length arguments))
                       (every (lambda (s) (instancep (cadr s) (car s))) (zip specializers arguments))))
@@ -53,7 +53,7 @@
         finally (return candidate)))
 
 (defun call-generic-function (gf &rest arguments)
-  (let* ((applicable-methods (compute-applicable-methods gf arguments))
+  (let* ((applicable-methods (compute-applicable-methods (generic-function-methods gf) arguments))
          (most-specific-method (select-most-specific-method arguments applicable-methods)))
     (funcall (method-function most-specific-method)
       arguments
