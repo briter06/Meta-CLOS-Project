@@ -13,10 +13,10 @@
 
 (defun class-all-superclasses (class)
   (cond
-   ((eql class *object*) ())
+   ((eql class *object*) (list *object*))
    (t (reduce
-          (lambda (acc x) (concat-sets (class-all-superclasses x) (adjoin x acc) :test (lambda (c1 c2) (eql (class-name-symbol c1) (class-name-symbol c2)))))
-          (class-direct-superclasses class) :initial-value ()))))
+          (lambda (acc x) (concat-sets (class-all-superclasses x) acc :test (lambda (c1 c2) (eql (class-name-symbol c1) (class-name-symbol c2)))))
+          (class-direct-superclasses class) :initial-value (list class)))))
 
 (defun subclassp (class1 class2)
   (member class2 (class-all-superclasses class1)))

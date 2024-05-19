@@ -7,6 +7,7 @@
 
 ;; Generic functions
 (load "src/miniclos/generic-functions/definitions.lisp")
+(load "src/miniclos/generic-functions/macros.lisp")
 
 ;; Precedence list
 (load "src/miniclos/precedence-list/precedence-list.lisp")

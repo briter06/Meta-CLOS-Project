@@ -1,3 +1,4 @@
+(in-package :closless)
 (load "src/utils/tests.lisp")
 (load "src/miniclos/loader.lisp")
 
