@@ -32,6 +32,9 @@
               `(error 'generic-function-error :message (format nil "Invalid number of arguments: ~d" ,new-num-args)))
             (t function-body))))
 
+(defun gen-let (variable-names lambda-arguments body)
+  (append `(let ,(loop for variable-name in variable-names for index from 0 collect `(,variable-name (nth ,index ,lambda-arguments)))) body))
+
 (defun defmethod-normal (name arguments body)
   (defmethod-helper name arguments
       (let ((args-mapper (extract-specializers-variables arguments)))
@@ -41,9 +44,7 @@
           :function ,(with-gensyms (lambda-arguments lambda-next-methods)
                       `(lambda (,lambda-arguments ,lambda-next-methods)
                         (labels ((call-next-method () ,(next-method-helper lambda-arguments lambda-next-methods)))
-                          ,(append
-                            `(let ,(loop for variable-name in (car args-mapper) for index from 0 collect `(,variable-name (nth ,index ,lambda-arguments))))
-                            body)))))))))
+                          ,(gen-let (car args-mapper) lambda-arguments body)))))))))
 
 (defun defmethod-before (name arguments body)
   (defmethod-helper name arguments
@@ -53,9 +54,7 @@
           :specializers ,(cons 'list (cadr args-mapper))
           :function ,(with-gensyms (lambda-arguments lambda-next-methods)
                       `(lambda (,lambda-arguments ,lambda-next-methods)
-                        ,(append
-                          `(let ,(loop for variable-name in (car args-mapper) for index from 0 collect `(,variable-name (nth ,index ,lambda-arguments))))
-                          body)
+                          ,(gen-let (car args-mapper) lambda-arguments body)
                           (when ,lambda-next-methods ,(next-method-helper lambda-arguments lambda-next-methods)))))))))
 
 (defun defmethod-after (name arguments body)
@@ -67,9 +66,7 @@
           :function ,(with-gensyms (lambda-arguments lambda-next-methods)
                       `(lambda (,lambda-arguments ,lambda-next-methods)
                         (when ,lambda-next-methods ,(next-method-helper lambda-arguments lambda-next-methods))
-                        ,(append
-                          `(let ,(loop for variable-name in (car args-mapper) for index from 0 collect `(,variable-name (nth ,index ,lambda-arguments))))
-                          body))))))))
+                        ,(gen-let (car args-mapper) lambda-arguments body))))))))
 
 (defmacro defmethod (name &rest all-arguments)
   (let ((first (car all-arguments))
