@@ -7,6 +7,7 @@
 
 (defstruct generic-function
   (methods '())
+  (before-methods '())
   (num-args 0))
 
 (defstruct method
@@ -22,11 +23,21 @@
   (setf (generic-function-methods gf)
     (remove method (generic-function-methods gf))))
 
+(defun remove-before-method (gf method)
+  (setf (generic-function-before-methods gf)
+    (remove method (generic-function-before-methods gf))))
+
 (defun add-method (gf method)
   (let ((old-method (find-method #'generic-function-methods gf (method-specializers method))))
     (when old-method
           (remove-method gf old-method)))
   (push method (generic-function-methods gf)))
+
+(defun add-before-method (gf method)
+  (let ((old-method (find-method #'generic-function-before-methods gf (method-specializers method))))
+    (when old-method
+          (remove-before-method gf old-method)))
+  (push method (generic-function-before-methods gf)))
 
 (defun compute-applicable-methods (methods arguments)
   (loop for method in methods
@@ -52,9 +63,14 @@
         do (setq candidate method)
         finally (return candidate)))
 
-(defun call-generic-function (gf &rest arguments)
-  (let* ((applicable-methods (compute-applicable-methods (generic-function-methods gf) arguments))
+(defun call-generic-function-helper (methods arguments)
+  (let* ((applicable-methods (compute-applicable-methods methods arguments))
          (most-specific-method (select-most-specific-method arguments applicable-methods)))
     (funcall (method-function most-specific-method)
       arguments
       (remove most-specific-method applicable-methods))))
+
+(defun call-generic-function (gf &rest arguments)
+  (when (generic-function-before-methods gf)
+    (call-generic-function-helper (generic-function-before-methods gf) arguments))
+  (call-generic-function-helper (generic-function-methods gf) arguments))

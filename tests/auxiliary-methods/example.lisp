@@ -12,7 +12,15 @@
 (defmethod square (x)
     (* (slot-value x 'value) (slot-value x 'value)))
 
-; (defmethod square :before (x)
-;     (print "Before square"))
+(defvar counter 0)
 
-(print (square num))
+(defmethod square :before (x)
+    (declare (ignore x))
+    (setf counter (+ 1 counter)))
+
+(assert-equals (square num) 25)
+(assert-equals counter 1)
+
+(unbound-variables '(<number> num square))
+
+(print "Auxiliary Methods | Assignment example => All the tests passed")
