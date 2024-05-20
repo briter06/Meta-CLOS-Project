@@ -5,8 +5,8 @@
 
 (defun mangle-class-name (class-symbol)
   (cond
-    ((eql class-symbol '*object*) class-symbol)
-    (t (intern (concatenate 'string "<" (string class-symbol) ">")))))
+   ((eql class-symbol '*object*) class-symbol)
+   (t (intern (concatenate 'string "<" (string class-symbol) ">")))))
 
 (defstruct class
   (name-symbol nil)

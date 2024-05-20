@@ -22,14 +22,14 @@
 
 (defmacro remove-method (method-list method)
   `(setf ,method-list
-    (remove ,method ,method-list)))
+     (remove ,method ,method-list)))
 
 (defmacro add-method-helper (method-list method)
   `(progn
-      (let ((old-method (find-method ,method-list (method-specializers ,method))))
-        (when old-method
-              (remove-method ,method-list old-method)))
-      (push ,method ,method-list)))
+    (let ((old-method (find-method ,method-list (method-specializers ,method))))
+      (when old-method
+            (remove-method ,method-list old-method)))
+    (push ,method ,method-list)))
 
 (defun add-method (gf method)
   (add-method-helper (generic-function-methods gf) method))
@@ -73,8 +73,8 @@
 
 (defun call-generic-function (gf &rest arguments)
   (when (generic-function-before-methods gf)
-    (call-generic-function-helper (generic-function-before-methods gf) arguments))
+        (call-generic-function-helper (generic-function-before-methods gf) arguments))
   (let ((result (call-generic-function-helper (generic-function-methods gf) arguments)))
     (when (generic-function-after-methods gf)
-      (call-generic-function-helper (generic-function-after-methods gf) arguments))
+          (call-generic-function-helper (generic-function-after-methods gf) arguments))
     result))
