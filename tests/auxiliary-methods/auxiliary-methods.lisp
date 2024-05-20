@@ -58,6 +58,15 @@
                  "After around Person"
                  "After around Student"))
 
+(setf logger '())
+(assert-equals (greet (make-instance 'person)) "Person - Main -> Around Person")
+(assert-equals logger
+               '("Before around Person"
+                 "I'm a person"
+                 "Person - Main"
+                 "Bye person"
+                 "After around Person"))
+
 (unbound-variables '(<person> <student> greet logger))
 
 (print "Auxiliary Methods => All the tests passed")
