@@ -117,4 +117,54 @@
 (assert-equals (population paris) 2.161)
 (assert-equals (population brussels) 0)
 
+(unbound-variables '(<city> paris brussels population))
+
+;; Scenario 5 | EQL specializer 2
+
+(defclass animal () ())
+(defclass dog (animal) ())
+
+(defclass food () ())
+(defclass apple (food) ())
+
+(defclass person () ())
+(defclass student (person) ())
+
+(defvar *super-apple* (make-instance 'apple))
+(defvar *super-person* (make-instance 'person))
+
+(defgeneric display (animal food person))
+
+(defmethod display ((dog dog) (apple apple) (person person))
+  (declare (ignore dog))
+  (declare (ignore apple))
+  (declare (ignore person))
+  "Method 1")
+
+(defmethod display ((dog dog) (apple apple) (student student))
+  (declare (ignore dog))
+  (declare (ignore apple))
+  (declare (ignore student))
+  (concatenate 'string "Method 2 -> " (call-next-method)))
+
+(defmethod display ((dog dog) (apple (eql *super-apple*)) (person person))
+  (declare (ignore dog))
+  (declare (ignore apple))
+  (declare (ignore person))
+  (concatenate 'string "Super Apple Method -> " (call-next-method)))
+
+(defmethod display ((dog dog) (apple apple) (person (eql *super-person*)))
+  (declare (ignore dog))
+  (declare (ignore apple))
+  (declare (ignore person))
+  (concatenate 'string "Super Person Method -> " (call-next-method)))
+
+(assert-equals (display (make-instance 'dog) (make-instance 'apple) (make-instance 'student)) "Method 2 -> Method 1")
+(assert-equals (display (make-instance 'dog) (make-instance 'apple) (make-instance 'person)) "Method 1")
+(assert-equals (display (make-instance 'dog) *super-apple* (make-instance 'person)) "Super Apple Method -> Method 1")
+(assert-equals (display (make-instance 'dog) (make-instance 'apple) *super-person*) "Super Person Method -> Method 1")
+(assert-equals (display (make-instance 'dog) *super-apple* *super-person*) "Super Apple Method -> Super Person Method -> Method 1")
+
+(unbound-variables '(<animal> <dog> <food> <apple> display *super-apple* *super-person*))
+
 (format t "Generic Functions => All the tests passed~%")
