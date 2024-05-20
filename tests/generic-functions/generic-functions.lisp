@@ -7,14 +7,14 @@
 (defclass person () (name address))
 (defclass employee (person) (employer))
 
-(defparameter p (make-instance 'person))
-(setf (slot-value p 'name) "Briter")
-(setf (slot-value p 'address) "Brussels")
+(defparameter person-obj (make-instance 'person))
+(setf (slot-value person-obj 'name) "Briter")
+(setf (slot-value person-obj 'address) "Brussels")
 
-(defparameter e (make-instance 'employee))
-(setf (slot-value e 'name) "Andres")
-(setf (slot-value e 'address) "Ghent")
-(setf (slot-value e 'employer) "VUB")
+(defparameter employee-obj (make-instance 'employee))
+(setf (slot-value employee-obj 'name) "Andres")
+(setf (slot-value employee-obj 'address) "Ghent")
+(setf (slot-value employee-obj 'employer) "VUB")
 
 (defgeneric display (object))
 
@@ -24,7 +24,7 @@
   (declare (ignore person))
   (error 'generic-function-error :message "This method should be overriden"))
 
-(assert-should-raise (display p) generic-function-error "This method should be overriden")
+(assert-should-raise (display person-obj) generic-function-error "This method should be overriden")
 
 (defmethod display ((person person))
   `(,(slot-value person 'name) ,(slot-value person 'address)))
@@ -32,9 +32,34 @@
 (defmethod display ((employee employee))
   (cons (slot-value employee 'employer) (call-next-method)))
 
-(assert-equals (display p) '("Briter" "Brussels"))
-(assert-equals (display e) '("VUB" "Andres" "Ghent"))
+(assert-equals (display person-obj) '("Briter" "Brussels"))
+(assert-equals (display employee-obj) '("VUB" "Andres" "Ghent"))
 
-(unbound-variables '(<person> <employee> p e display))
+(unbound-variables '(<person> <employee> person-obj employee-obj display))
+
+;; Scenario 2 | Inner precedence
+
+(defclass animal () ())
+(defclass dog (animal) ())
+
+(defclass food () ())
+(defclass apple (food) ())
+
+(defgeneric display (animal food))
+
+(defmethod display ((animal animal) (apple apple))
+  (declare (ignore animal))
+  (declare (ignore apple))
+  "Method 1")
+
+(defmethod display ((dog dog) (food food))
+  (declare (ignore dog))
+  (declare (ignore food))
+  "Method 2")
+
+(assert-equals (display (make-instance 'dog) (make-instance 'apple)) "Method 2")
+(assert-equals (display (make-instance 'animal) (make-instance 'apple)) "Method 1")
+
+(unbound-variables '(<animal> <dog> <food> <apple> display))
 
 (format t "Generic Functions => All the tests passed~%")

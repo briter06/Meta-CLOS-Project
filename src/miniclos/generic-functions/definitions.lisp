@@ -56,7 +56,12 @@
     (< (position (class-name-symbol class1) precedence-list) (position (class-name-symbol class2) precedence-list))))
 
 (defun is-more-specific-list? (arguments specializers1 specializers2)
-  (some (lambda (tuple) (is-more-specific? (object-class (first tuple)) (second tuple) (third tuple))) (zip3 arguments specializers1 specializers2)))
+  (let ((main-class (object-class (car arguments)))
+        (class1 (car specializers1))
+        (class2 (car specializers2)))
+    (cond
+     ((eql class1 class2) (is-more-specific-list? (cdr arguments) (cdr specializers1) (cdr specializers2)))
+     (t (is-more-specific? main-class class1 class2)))))
 
 (defun select-most-specific-method (arguments methods)
   (loop with candidate = (first methods)
