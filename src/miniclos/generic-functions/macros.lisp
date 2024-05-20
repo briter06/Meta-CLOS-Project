@@ -3,10 +3,19 @@
 (load "src/utils/lists.lisp")
 (load "src/utils/with-gensyms.lisp")
 
-(defmacro defgeneric (name args)
-  `(progn
-    (defvar ,name (make-generic-function :num-args ,(length args)))
-    (defun ,name (&rest arguments) (apply #'call-generic-function (cons ,name arguments)))))
+(defmacro defgeneric (name &rest all-arguments)
+  (append
+    `(progn (defvar ,name (make-generic-function :num-args ,(length (car all-arguments)))))
+    (cond
+     ((getf (cadr all-arguments) :cached)
+       (let ((args-cache (cons 'list (car all-arguments))))
+         `((defmethod ,name :around ,(mapcar (lambda (x) `(,x *object*)) (car all-arguments))
+             (or (get-from-cache ,name ,args-cache)
+                 (let ((result (call-next-method)))
+                   (add-to-cache ,name ,args-cache result)
+                   result))))))
+     (t '()))
+    `((defun ,name (&rest arguments) (apply #'call-generic-function (cons ,name arguments))))))
 
 (defun extract-specializers-variables (arguments)
   (reduce (lambda (acc tuple)

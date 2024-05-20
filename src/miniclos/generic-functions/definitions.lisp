@@ -10,7 +10,14 @@
   (before-methods '())
   (after-methods '())
   (around-methods '())
-  (num-args 0))
+  (num-args 0)
+  (cache (make-hash-table)))
+
+(defun get-from-cache (gf arguments)
+  (gethash (sxhash arguments) (generic-function-cache gf)))
+
+(defun add-to-cache (gf arguments result)
+  (setf (gethash (sxhash arguments) (generic-function-cache gf)) result))
 
 (defstruct method
   (specializers '())
