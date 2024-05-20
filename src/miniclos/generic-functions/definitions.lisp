@@ -9,6 +9,7 @@
   (methods '())
   (before-methods '())
   (after-methods '())
+  (around-methods '())
   (num-args 0))
 
 (defstruct method
@@ -71,10 +72,13 @@
       arguments
       (remove most-specific-method applicable-methods))))
 
-(defun call-generic-function (gf &rest arguments)
+(defun call-main-generic-function (gf arguments)
   (when (generic-function-before-methods gf)
         (call-generic-function-helper (generic-function-before-methods gf) arguments))
   (let ((result (call-generic-function-helper (generic-function-methods gf) arguments)))
     (when (generic-function-after-methods gf)
           (call-generic-function-helper (generic-function-after-methods gf) arguments))
     result))
+
+(defun call-generic-function (gf &rest arguments)
+  (call-main-generic-function gf arguments))
