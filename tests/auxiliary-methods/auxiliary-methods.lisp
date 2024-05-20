@@ -19,6 +19,13 @@
   (declare (ignore o))
   (setf logger (append logger '("Bye person"))))
 
+; (defmethod greet :around ((o person))
+;   (declare (ignore o))
+;   (print "Before around Person")
+;   (call-next-method)
+;   ; (print "After around Person")
+;   )
+
 (defmethod greet :before ((o student))
   (declare (ignore o))
   (setf logger (append logger '("I'm a student"))))
@@ -32,3 +39,5 @@
 (unbound-variables '(<person> <student> greet logger))
 
 (print "Auxiliary Methods => All the tests passed")
+
+; (print (greet (make-instance 'student)))

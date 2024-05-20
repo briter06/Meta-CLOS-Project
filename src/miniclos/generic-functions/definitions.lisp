@@ -41,6 +41,9 @@
 (defun add-after-method (gf method)
   (add-method-helper (generic-function-after-methods gf) method))
 
+(defun add-around-method (gf method)
+  (add-method-helper (generic-function-around-methods gf) method))
+
 (defun compute-applicable-methods (methods arguments)
   (loop for method in methods
           when (let ((specializers (method-specializers method)))
@@ -81,4 +84,6 @@
     result))
 
 (defun call-generic-function (gf &rest arguments)
-  (call-main-generic-function gf arguments))
+  (if (generic-function-around-methods gf)
+      (call-generic-function-helper (generic-function-around-methods gf) arguments)
+      (call-main-generic-function gf arguments)))

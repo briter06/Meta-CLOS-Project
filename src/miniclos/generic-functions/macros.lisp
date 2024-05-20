@@ -35,16 +35,16 @@
 (defun gen-let (variable-names lambda-arguments body)
   (append `(let ,(loop for variable-name in variable-names for index from 0 collect `(,variable-name (nth ,index ,lambda-arguments)))) body))
 
-(defun defmethod-normal (name arguments body)
+(defun defmethod-normal (method-symbol next-method-symbol name arguments body)
   (defmethod-helper name arguments
                     (let ((args-mapper (extract-specializers-variables arguments)))
-                      `(add-method ,name
-                                   (make-method
-                                    :specializers ,(cons 'list (cadr args-mapper))
-                                    :function ,(with-gensyms (lambda-arguments lambda-next-methods)
-                                                             `(lambda (,lambda-arguments ,lambda-next-methods)
-                                                                (labels ((call-next-method () ,(next-method-helper lambda-arguments lambda-next-methods)))
-                                                                  ,(gen-let (car args-mapper) lambda-arguments body)))))))))
+                      `(,method-symbol ,name
+                         (make-method
+                          :specializers ,(cons 'list (cadr args-mapper))
+                          :function ,(with-gensyms (lambda-arguments lambda-next-methods)
+                                                   `(lambda (,lambda-arguments ,lambda-next-methods)
+                                                      (labels ((call-next-method () ,(funcall next-method-symbol lambda-arguments lambda-next-methods)))
+                                                        ,(gen-let (car args-mapper) lambda-arguments body)))))))))
 
 (defun defmethod-before (name arguments body)
   (defmethod-helper name arguments
@@ -74,5 +74,5 @@
     (cond
      ((eql first ':before) (defmethod-before name (car rest) (cdr rest)))
      ((eql first ':after) (defmethod-after name (car rest) (cdr rest)))
-     ((eql first ':around) (error "Not implemented yet"))
-     (t (defmethod-normal name first rest)))))
+     ((eql first ':around) (defmethod-normal 'add-around-method #'next-method-helper name (car rest) (cdr rest)))
+     (t (defmethod-normal 'add-method #'next-method-helper name first rest)))))
