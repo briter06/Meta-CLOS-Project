@@ -10,8 +10,11 @@
   (before-methods '())
   (after-methods '())
   (around-methods '())
-  (num-args 0)
+  (argument-precedence-order '())
   (cache (make-hash-table)))
+
+(defun arguments-length (gf)
+  (length (generic-function-argument-precedence-order gf)))
 
 (defun get-from-cache (gf arguments)
   (gethash (sxhash arguments) (generic-function-cache gf)))
@@ -72,40 +75,43 @@
    (t (let ((precedence-list (class-precedence-list main-class)))
         (< (position specializer1 precedence-list) (position specializer2 precedence-list))))))
 
-(defun is-more-specific-list? (arguments specializers1 specializers2)
-  (let ((main-class (object-class (car arguments)))
-        (specializer1 (car specializers1))
-        (specializer2 (car specializers2)))
-    (cond
-     ((eql specializer1 specializer2) (is-more-specific-list? (cdr arguments) (cdr specializers1) (cdr specializers2)))
-     (t (is-more-specific? main-class specializer1 specializer2)))))
+(defun is-more-specific-list? (precedence-order arguments specializers1 specializers2)
+  (if precedence-order
+      (let ((main-class (object-class (nth (car precedence-order) arguments)))
+            (specializer1 (nth (car precedence-order) specializers1))
+            (specializer2 (nth (car precedence-order) specializers2)))
+        (cond
+         ((eql specializer1 specializer2) (is-more-specific-list? (cdr precedence-order) arguments specializers1 specializers2))
+         (t (is-more-specific? main-class specializer1 specializer2))))
+      nil))
 
-(defun select-most-specific-method (arguments methods)
+(defun select-most-specific-method (precedence-order arguments methods)
   (loop with candidate = (first methods)
         for method in (rest methods)
           when (is-more-specific-list?
+                precedence-order
                 arguments
                 (method-specializers method)
                 (method-specializers candidate))
         do (setq candidate method)
         finally (return candidate)))
 
-(defun call-generic-function-helper (methods arguments)
+(defun call-generic-function-helper (precedence-order methods arguments)
   (let* ((applicable-methods (compute-applicable-methods methods arguments))
-         (most-specific-method (select-most-specific-method arguments applicable-methods)))
+         (most-specific-method (select-most-specific-method precedence-order arguments applicable-methods)))
     (funcall (method-function most-specific-method)
       arguments
       (remove most-specific-method applicable-methods))))
 
 (defun call-main-generic-function (gf arguments)
   (when (generic-function-before-methods gf)
-        (call-generic-function-helper (generic-function-before-methods gf) arguments))
-  (let ((result (call-generic-function-helper (generic-function-methods gf) arguments)))
+        (call-generic-function-helper (generic-function-argument-precedence-order gf) (generic-function-before-methods gf) arguments))
+  (let ((result (call-generic-function-helper (generic-function-argument-precedence-order gf) (generic-function-methods gf) arguments)))
     (when (generic-function-after-methods gf)
-          (call-generic-function-helper (generic-function-after-methods gf) arguments))
+          (call-generic-function-helper (generic-function-argument-precedence-order gf) (generic-function-after-methods gf) arguments))
     result))
 
 (defun call-generic-function (gf &rest arguments)
   (if (generic-function-around-methods gf)
-      (call-generic-function-helper (generic-function-around-methods gf) arguments)
+      (call-generic-function-helper (generic-function-argument-precedence-order gf) (generic-function-around-methods gf) arguments)
       (call-main-generic-function gf arguments)))

@@ -5,7 +5,10 @@
 
 (defmacro defgeneric (name &rest all-arguments)
   (append
-    `(progn (defvar ,name (make-generic-function :num-args ,(length (car all-arguments)))))
+    `(progn
+      (defvar ,name (make-generic-function
+                     :argument-precedence-order
+                     ',(get-positions (car all-arguments) (or (getf (cadr all-arguments) :argument-precedence-order) (car all-arguments))))))
     (cond
      ((getf (cadr all-arguments) :cached)
        (let ((args-cache (cons 'list (car all-arguments))))
@@ -32,9 +35,8 @@
       (reverse arguments) :initial-value '(() ())))
 
 (defun next-method-helper (gf arguments next-methods)
-  (declare (ignore gf))
   (with-gensyms (next-most-specific-method)
-                `(let ((,next-most-specific-method (select-most-specific-method ,arguments ,next-methods)))
+                `(let ((,next-most-specific-method (select-most-specific-method (generic-function-argument-precedence-order ,gf) ,arguments ,next-methods)))
                    (if ,next-most-specific-method
                        (funcall (method-function ,next-most-specific-method)
                          ,arguments
@@ -48,7 +50,7 @@
 
 (defun defmethod-helper (gf arguments function-body)
   (let ((new-num-args (length arguments))
-        (num-args (generic-function-num-args (symbol-value gf))))
+        (num-args (arguments-length (symbol-value gf))))
     (cond
      ((not (eql new-num-args num-args))
        `(error 'generic-function-error :message (format nil "Invalid number of arguments: ~d" ,new-num-args)))

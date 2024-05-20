@@ -10,4 +10,6 @@
 (format t "~%")
 (format t "============== ADDITIONAL REQUIREMENTS ====================~%")
 (format t "~%")
-(load "tests/cache/cache.lisp")
+(load "tests/additional-requirements/cache/cache.lisp")
+(load "tests/additional-requirements/eql-specializer/eql-specializer.lisp")
+(load "tests/additional-requirements/argument-precedence-order/argument-precedence-order.lisp")

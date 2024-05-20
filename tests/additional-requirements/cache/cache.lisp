@@ -2,6 +2,8 @@
 (load "src/utils/tests.lisp")
 (load "src/miniclos/loader.lisp")
 
+(format t "Cache | Squared => Start testing~%")
+(format t "~%")
 
 (defclass number () (value))
 
@@ -11,9 +13,6 @@
 (defmethod squared (x)
   (setf counter (+ 1 counter))
   (* (slot-value x 'value) (slot-value x 'value)))
-
-(format t "Cache | Squared => Start testing~%")
-(format t "~%")
 
 (print-command (defvar num (make-instance 'number)))
 (format t "~%")
