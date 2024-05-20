@@ -15,7 +15,8 @@
                 `(,(cons tuple (car acc)) ,(cons '*object* (cadr acc)))))
       (reverse arguments) :initial-value '(() ())))
 
-(defun next-method-helper (arguments next-methods)
+(defun next-method-helper (gf arguments next-methods)
+  (declare (ignore gf))
   (with-gensyms (next-most-specific-method)
                 `(let ((,next-most-specific-method (select-most-specific-method ,arguments ,next-methods)))
                    (if ,next-most-specific-method
@@ -23,6 +24,11 @@
                          ,arguments
                          (remove ,next-most-specific-method ,next-methods))
                        (error 'generic-function-error :message "There is no available next method")))))
+
+(defun next-method-around (gf arguments next-methods)
+  `(if ,next-methods
+      ,(next-method-helper gf arguments next-methods)
+      (call-main-generic-function ,gf ,arguments)))
 
 (defun defmethod-helper (name arguments function-body)
   (let ((new-num-args (length arguments))
@@ -43,7 +49,7 @@
                           :specializers ,(cons 'list (cadr args-mapper))
                           :function ,(with-gensyms (lambda-arguments lambda-next-methods)
                                                    `(lambda (,lambda-arguments ,lambda-next-methods)
-                                                      (labels ((call-next-method () ,(funcall next-method-symbol lambda-arguments lambda-next-methods)))
+                                                      (labels ((call-next-method () ,(funcall next-method-symbol name lambda-arguments lambda-next-methods)))
                                                         ,(gen-let (car args-mapper) lambda-arguments body)))))))))
 
 (defun defmethod-before (name arguments body)
@@ -55,7 +61,7 @@
                                            :function ,(with-gensyms (lambda-arguments lambda-next-methods)
                                                                     `(lambda (,lambda-arguments ,lambda-next-methods)
                                                                        ,(gen-let (car args-mapper) lambda-arguments body)
-                                                                       (when ,lambda-next-methods ,(next-method-helper lambda-arguments lambda-next-methods)))))))))
+                                                                       (when ,lambda-next-methods ,(next-method-helper name lambda-arguments lambda-next-methods)))))))))
 
 (defun defmethod-after (name arguments body)
   (defmethod-helper name arguments
@@ -65,7 +71,7 @@
                                           :specializers ,(cons 'list (cadr args-mapper))
                                           :function ,(with-gensyms (lambda-arguments lambda-next-methods)
                                                                    `(lambda (,lambda-arguments ,lambda-next-methods)
-                                                                      (when ,lambda-next-methods ,(next-method-helper lambda-arguments lambda-next-methods))
+                                                                      (when ,lambda-next-methods ,(next-method-helper name lambda-arguments lambda-next-methods))
                                                                       ,(gen-let (car args-mapper) lambda-arguments body))))))))
 
 (defmacro defmethod (name &rest all-arguments)
@@ -74,5 +80,5 @@
     (cond
      ((eql first ':before) (defmethod-before name (car rest) (cdr rest)))
      ((eql first ':after) (defmethod-after name (car rest) (cdr rest)))
-     ((eql first ':around) (defmethod-normal 'add-around-method #'next-method-helper name (car rest) (cdr rest)))
+     ((eql first ':around) (defmethod-normal 'add-around-method #'next-method-around name (car rest) (cdr rest)))
      (t (defmethod-normal 'add-method #'next-method-helper name first rest)))))

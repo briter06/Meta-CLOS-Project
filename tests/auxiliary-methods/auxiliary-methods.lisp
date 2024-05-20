@@ -9,8 +9,14 @@
 
 (defgeneric greet (o))
 
-(defmethod greet ((o person)) (declare (ignore o)) "Person - Main")
-(defmethod greet ((o student)) (declare (ignore o)) "Student - Main")
+(defmethod greet ((o person))
+  (declare (ignore o))
+  (setf logger (append logger '("Person - Main")))
+  "Person - Main")
+(defmethod greet ((o student))
+  (declare (ignore o))
+  (setf logger (append logger '("Student - Main")))
+  "Student - Main")
 
 (defmethod greet :before ((o person))
   (declare (ignore o))
@@ -19,12 +25,12 @@
   (declare (ignore o))
   (setf logger (append logger '("Bye person"))))
 
-; (defmethod greet :around ((o person))
-;   (declare (ignore o))
-;   (print "Before around Person")
-;   (call-next-method)
-;   ; (print "After around Person")
-;   )
+(defmethod greet :around ((o person))
+  (declare (ignore o))
+  (setf logger (append logger '("Before around Person")))
+  (let ((result (call-next-method)))
+    (setf logger (append logger '("After around Person")))
+    (concatenate 'string result " -> Around Person")))
 
 (defmethod greet :before ((o student))
   (declare (ignore o))
@@ -33,11 +39,25 @@
   (declare (ignore o))
   (setf logger (append logger '("Bye student"))))
 
-(assert-equals (greet (make-instance 'student)) "Student - Main")
-(assert-equals logger '("I'm a student" "I'm a person" "Bye person" "Bye student"))
+(defmethod greet :around ((o student))
+  (declare (ignore o))
+  (setf logger (append logger '("Before around Student")))
+  (let ((result (call-next-method)))
+    (setf logger (append logger '("After around Student")))
+    (concatenate 'string result " -> Around Student")))
+
+(assert-equals (greet (make-instance 'student)) "Student - Main -> Around Person -> Around Student")
+(assert-equals logger
+               '("Before around Student"
+                 "Before around Person"
+                 "I'm a student"
+                 "I'm a person"
+                 "Student - Main"
+                 "Bye person"
+                 "Bye student"
+                 "After around Person"
+                 "After around Student"))
 
 (unbound-variables '(<person> <student> greet logger))
 
 (print "Auxiliary Methods => All the tests passed")
-
-; (print (greet (make-instance 'student)))
