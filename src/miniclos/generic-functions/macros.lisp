@@ -17,13 +17,18 @@
      (t '()))
     `((defun ,name (&rest arguments) (apply #'call-generic-function (cons ,name arguments))))))
 
+(defun transform-specializer (specializer)
+  (if (listp specializer)
+      specializer
+      (mangle-class-name specializer)))
+
 (defun extract-specializers-variables (arguments)
   (reduce (lambda (acc tuple)
-            (if (listp tuple)
-                `(,(cons (car tuple) (car acc))
-                   ,(let ((spe (cadr tuple)))
-                      (cons (if (listp spe) spe (mangle-class-name spe)) (cadr acc))))
-                `(,(cons tuple (car acc)) ,(cons '*object* (cadr acc)))))
+            (let ((objects (car acc))
+                  (specializers (cadr acc)))
+              (if (listp tuple)
+                  `(,(cons (car tuple) objects) ,(cons (transform-specializer (cadr tuple)) specializers))
+                  `(,(cons tuple objects) ,(cons '*object* specializers)))))
       (reverse arguments) :initial-value '(() ())))
 
 (defun next-method-helper (gf arguments next-methods)

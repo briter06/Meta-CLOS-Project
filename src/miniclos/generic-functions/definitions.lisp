@@ -55,12 +55,14 @@
   (loop for method in methods
           when (let ((specializers (method-specializers method)))
                  (and (eql (length specializers) (length arguments))
-                      (every (lambda (s)
-                               (if (listp (car s))
-                                   (cond
-                                    ((eql (car (car s)) 'eql) (eql (symbol-value (cadr (car s))) (cadr s)))
-                                    (t (error "Invalid specializer")))
-                                   (instancep (cadr s) (symbol-value (car s))))) (zip specializers arguments))))
+                      (every (lambda (tuple)
+                               (let ((specializer (car tuple))
+                                     (argument (cadr tuple)))
+                                 (if (listp specializer)
+                                     (cond
+                                      ((eql (car specializer) 'eql) (eql (symbol-value (cadr specializer)) argument))
+                                      (t (error "Invalid specializer")))
+                                     (instancep argument (symbol-value specializer))))) (zip specializers arguments))))
         collect method))
 
 (defun is-more-specific? (main-class specializer1 specializer2)
