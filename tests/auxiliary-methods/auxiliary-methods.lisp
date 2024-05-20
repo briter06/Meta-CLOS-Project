@@ -7,46 +7,46 @@
 
 (defvar logger '())
 
-(defgeneric greet (o))
+(defgeneric run (o))
 
-(defmethod greet ((o person))
+(defmethod run ((o person))
   (declare (ignore o))
-  (setf logger (append logger '("Person - Main")))
+  (add-log logger "Person - Main")
   "Person - Main")
-(defmethod greet ((o student))
+(defmethod run ((o student))
   (declare (ignore o))
-  (setf logger (append logger '("Student - Main")))
+  (add-log logger "Student - Main")
   "Student - Main")
 
-(defmethod greet :before ((o person))
+(defmethod run :before ((o person))
   (declare (ignore o))
-  (setf logger (append logger '("I'm a person"))))
-(defmethod greet :after ((o person))
+  (add-log logger "I'm a person"))
+(defmethod run :after ((o person))
   (declare (ignore o))
-  (setf logger (append logger '("Bye person"))))
+  (add-log logger "Bye person"))
 
-(defmethod greet :around ((o person))
+(defmethod run :around ((o person))
   (declare (ignore o))
-  (setf logger (append logger '("Before around Person")))
+  (add-log logger "Before around Person")
   (let ((result (call-next-method)))
-    (setf logger (append logger '("After around Person")))
+    (add-log logger "After around Person")
     (concatenate 'string result " -> Around Person")))
 
-(defmethod greet :before ((o student))
+(defmethod run :before ((o student))
   (declare (ignore o))
-  (setf logger (append logger '("I'm a student"))))
-(defmethod greet :after ((o student))
+  (add-log logger "I'm a student"))
+(defmethod run :after ((o student))
   (declare (ignore o))
-  (setf logger (append logger '("Bye student"))))
+  (add-log logger "Bye student"))
 
-(defmethod greet :around ((o student))
+(defmethod run :around ((o student))
   (declare (ignore o))
-  (setf logger (append logger '("Before around Student")))
+  (add-log logger "Before around Student")
   (let ((result (call-next-method)))
-    (setf logger (append logger '("After around Student")))
+    (add-log logger "After around Student")
     (concatenate 'string result " -> Around Student")))
 
-(assert-equals (greet (make-instance 'student)) "Student - Main -> Around Person -> Around Student")
+(assert-equals (run (make-instance 'student)) "Student - Main -> Around Person -> Around Student")
 (assert-equals logger
                '("Before around Student"
                  "Before around Person"
@@ -59,7 +59,7 @@
                  "After around Student"))
 
 (setf logger '())
-(assert-equals (greet (make-instance 'person)) "Person - Main -> Around Person")
+(assert-equals (run (make-instance 'person)) "Person - Main -> Around Person")
 (assert-equals logger
                '("Before around Person"
                  "I'm a person"
@@ -67,6 +67,6 @@
                  "Bye person"
                  "After around Person"))
 
-(unbound-variables '(<person> <student> greet logger))
+(unbound-variables '(<person> <student> run logger))
 
-(print "Auxiliary Methods => All the tests passed")
+(format t "Auxiliary Methods => All the tests passed~%")

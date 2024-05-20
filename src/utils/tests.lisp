@@ -14,3 +14,22 @@
 
 (defun unbound-variables (variables)
   (loop for variable in variables do (makunbound variable) finally (return t)))
+
+(defun print-command-result (x)
+  (format t "~2a> ~d~%" "" x)
+  x)
+
+(defmacro print-command (command)
+  (format t "~2a~d~%" "" command)
+  `(print-command-result ,command))
+
+(defun add-log-helper (logger message)
+  `(setf ,logger (append ,logger (list ,message))))
+
+(defmacro add-log (logger message)
+  (add-log-helper logger message))
+
+(defmacro log-msg (logger message)
+  `(progn
+    (print-command-result ,message)
+    ,(add-log-helper logger message)))

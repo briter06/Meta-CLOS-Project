@@ -82,4 +82,4 @@
 
 (unbound-variables '(<K> <I> <G> <E> <B> <J> <H> <F> <C> <D> <A>))
 
-(print "Precedence List => All the tests passed")
+(format t "Precedence List => All the tests passed~%")

@@ -44,12 +44,25 @@
 (defvar *cat-food* (make-instance 'cat-food))
 (defvar *dog-food* (make-instance 'dog-food))
 
-(assert-equals (eat *my-dog* *dog-food*) "I like dog food!")
-(assert-equals (eat *my-cat* *cat-food*) "I like cat food!")
-(assert-equals (eat *my-dog* *cat-food*) "I cannot eat cat food")
-(assert-equals (eat *my-cat* *dog-food*) "I cannot eat this food")
-(assert-equals (eat *my-cat* *my-pig*) "What you are giving me is not food")
+(format t "Multiple Dispatch | Assignment example | Animals => Start testing~%")
+(format t "~%")
+
+(assert-equals (print-command (eat *my-dog* *dog-food*)) "I like dog food!")
+(format t "~%")
+
+(assert-equals (print-command (eat *my-cat* *cat-food*)) "I like cat food!")
+(format t "~%")
+
+(assert-equals (print-command (eat *my-dog* *cat-food*)) "I cannot eat cat food")
+(format t "~%")
+
+(assert-equals (print-command (eat *my-cat* *dog-food*)) "I cannot eat this food")
+(format t "~%")
+
+(assert-equals (print-command (eat *my-cat* *my-pig*)) "What you are giving me is not food")
+(format t "~%")
 
 (unbound-variables '(*my-cat* *my-dog* *my-pig* *cat-food* *dog-food* eat <food> <dog-food> <cat-food> <animal> <dog> <cat> <pig>))
 
-(print "Generic Functions | Multiple Dispatch | Assignment example => All the tests passed")
+(format t "Multiple Dispatch | Assignment example | Animals => All the tests passed~%")
+(format t "~%")

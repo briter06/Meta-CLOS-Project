@@ -27,11 +27,19 @@
 (defvar person (make-instance 'Person))
 (defvar staff (make-instance 'Staff))
 
-(assert-equals (study phdstudent) "Let's study.")
-(assert-equals (study person) "I'm not a student.")
-(assert-equals (study staff) "I work with students, but I'm not a student.")
-(assert-equals (greet phdstudent) "Let's research! Deadlines? Deadlines! Time is ticking. How are you?")
+(format t "Multiple Inheritance | Assignment example | Students => Start testing~%")
+(format t "~%")
+
+(assert-equals (print-command (study phdstudent)) "Let's study.")
+(format t "~%")
+(assert-equals (print-command (study person)) "I'm not a student.")
+(format t "~%")
+(assert-equals (print-command (study staff)) "I work with students, but I'm not a student.")
+(format t "~%")
+(assert-equals (print-command (greet phdstudent)) "Let's research! Deadlines? Deadlines! Time is ticking. How are you?")
+(format t "~%")
 
 (unbound-variables '(<Person> <Staff> <Student> <PhDStudent> study greet phdstudent person staff))
 
-(print "Generic Functions | Multiple Inheritance | Assignment example => All the tests passed")
+(format t "Multiple Inheritance | Assignment example | Students => All the tests passed~%")
+(format t "~%")
