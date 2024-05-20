@@ -2,6 +2,12 @@
 (load "src/utils/tests.lisp")
 (load "src/miniclos/loader.lisp")
 
+(format t "MULTIPLE DISPATCH:~%")
+(format t "~%")
+
+(format t "Multiple Dispatch | Assignment example | Animals => Start testing~%")
+(format t "~%")
+
 (defclass animal () ())
 (defclass dog (animal) ())
 (defclass cat (animal) ())
@@ -44,9 +50,6 @@
 (defvar *cat-food* (make-instance 'cat-food))
 (defvar *dog-food* (make-instance 'dog-food))
 
-(format t "Multiple Dispatch | Assignment example | Animals => Start testing~%")
-(format t "~%")
-
 (assert-equals (print-command (eat *my-dog* *dog-food*)) "I like dog food!")
 (format t "~%")
 
@@ -65,4 +68,5 @@
 (unbound-variables '(*my-cat* *my-dog* *my-pig* *cat-food* *dog-food* eat <food> <dog-food> <cat-food> <animal> <dog> <cat> <pig>))
 
 (format t "Multiple Dispatch | Assignment example | Animals => All the tests passed~%")
+(format t "----------------------------------------------------------------------------------~%")
 (format t "~%")

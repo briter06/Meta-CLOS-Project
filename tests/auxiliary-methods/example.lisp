@@ -2,6 +2,12 @@
 (load "src/utils/tests.lisp")
 (load "src/miniclos/loader.lisp")
 
+(format t "AUXILIARY METHODS:~%")
+(format t "~%")
+
+(format t "Auxiliary Methods | Assignment example | Square => Start testing~%")
+(format t "~%")
+
 (defclass number () (value))
 
 (defgeneric square (x))
@@ -16,9 +22,6 @@
 
 (defmethod square :after (x)
   (log-msg logger (concatenate 'string "Just calculated the square of " (write-to-string (slot-value x 'value)))))
-
-(format t "Auxiliary Methods | Assignment example | Square => Start testing~%")
-(format t "~%")
 
 (print-command (defvar num (make-instance 'number)))
 (format t "~%")
@@ -66,4 +69,5 @@
 (unbound-variables '(<number> num num1 num2 square multiply logger))
 
 (format t "Auxiliary Methods | Assignment example | Multiply => All the tests passed~%")
+(format t "----------------------------------------------------------------------------------~%")
 (format t "~%")

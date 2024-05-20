@@ -2,6 +2,9 @@
 (load "src/utils/tests.lisp")
 (load "src/miniclos/loader.lisp")
 
+(format t "EQL SPECIALIZER:~%")
+(format t "~%")
+
 ;; Scenario 1 | EQL specializer
 
 (defclass city () (population))
@@ -81,4 +84,5 @@
 (unbound-variables '(<animal> <dog> <food> <apple> display-eql *super-apple* *super-person*))
 
 (format t "EQL Specializer | Animals => All the tests passed~%")
+(format t "----------------------------------------------------------------------------------~%")
 (format t "~%")

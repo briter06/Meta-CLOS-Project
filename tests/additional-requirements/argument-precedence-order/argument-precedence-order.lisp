@@ -11,6 +11,9 @@
 (defclass location () ())
 (defclass city (location) ())
 
+(format t "ARGUMENT PRECEDENCE ORDER:~%")
+(format t "~%")
+
 ;; Scenario 2 | Different order
 
 (format t "Argument Precedence Order | Default order => Start testing~%")
@@ -77,4 +80,5 @@
 (unbound-variables '(<animal> <dog> <food> <apple> <location> <city> display-order display-diff-order))
 
 (format t "Argument Precedence Order | Different order => All the tests passed~%")
+(format t "----------------------------------------------------------------------------------~%")
 (format t "~%")

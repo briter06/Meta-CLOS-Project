@@ -2,6 +2,9 @@
 (load "src/utils/tests.lisp")
 (load "src/miniclos/loader.lisp")
 
+(format t "CACHE:~%")
+(format t "~%")
+
 (format t "Cache | Squared => Start testing~%")
 (format t "~%")
 
@@ -28,4 +31,5 @@
 (format t "~%")
 
 (format t "Cache | Squared => All the tests passed~%")
+(format t "----------------------------------------------------------------------------------~%")
 (format t "~%")

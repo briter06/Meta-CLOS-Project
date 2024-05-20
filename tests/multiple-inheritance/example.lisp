@@ -2,6 +2,12 @@
 (load "src/utils/tests.lisp")
 (load "src/miniclos/loader.lisp")
 
+(format t "MULTIPLE INHERITANCE:~%")
+(format t "~%")
+
+(format t "Multiple Inheritance | Assignment example | Students => Start testing~%")
+(format t "~%")
+
 (defclass Person () ())
 (defclass Staff (Person) ())
 (defclass Student (Person) ())
@@ -36,9 +42,6 @@
 (defvar person (make-instance 'Person))
 (defvar staff (make-instance 'Staff))
 
-(format t "Multiple Inheritance | Assignment example | Students => Start testing~%")
-(format t "~%")
-
 (assert-equals (print-command (study phdstudent)) "Let's study.")
 (format t "~%")
 (assert-equals (print-command (study person)) "I'm not a student.")
@@ -51,4 +54,5 @@
 (unbound-variables '(<Person> <Staff> <Student> <PhDStudent> study greet phdstudent person staff))
 
 (format t "Multiple Inheritance | Assignment example | Students => All the tests passed~%")
+(format t "----------------------------------------------------------------------------------~%")
 (format t "~%")
