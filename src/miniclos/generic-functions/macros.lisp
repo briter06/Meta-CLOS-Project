@@ -20,7 +20,9 @@
 (defun extract-specializers-variables (arguments)
   (reduce (lambda (acc tuple)
             (if (listp tuple)
-                `(,(cons (car tuple) (car acc)) ,(cons (mangle-class-name (cadr tuple)) (cadr acc)))
+                `(,(cons (car tuple) (car acc))
+                   ,(let ((spe (cadr tuple)))
+                      (cons (if (listp spe) spe (mangle-class-name spe)) (cadr acc))))
                 `(,(cons tuple (car acc)) ,(cons '*object* (cadr acc)))))
       (reverse arguments) :initial-value '(() ())))
 
@@ -55,7 +57,7 @@
                     (let ((args-mapper (extract-specializers-variables arguments)))
                       `(,method-symbol ,gf
                          (make-method
-                          :specializers ,(cons 'list (cadr args-mapper))
+                          :specializers ',(cadr args-mapper)
                           :function ,(with-gensyms (lambda-arguments lambda-next-methods)
                                                    `(lambda (,lambda-arguments ,lambda-next-methods)
                                                       (labels ((call-next-method () ,(funcall next-method-symbol gf lambda-arguments lambda-next-methods)))
@@ -66,7 +68,7 @@
                     (let ((args-mapper (extract-specializers-variables arguments)))
                       `(add-before-method ,gf
                                           (make-method
-                                           :specializers ,(cons 'list (cadr args-mapper))
+                                           :specializers ',(cadr args-mapper)
                                            :function ,(with-gensyms (lambda-arguments lambda-next-methods)
                                                                     `(lambda (,lambda-arguments ,lambda-next-methods)
                                                                        ,(gen-let (car args-mapper) lambda-arguments body)
@@ -77,7 +79,7 @@
                     (let ((args-mapper (extract-specializers-variables arguments)))
                       `(add-after-method ,gf
                                          (make-method
-                                          :specializers ,(cons 'list (cadr args-mapper))
+                                          :specializers ',(cadr args-mapper)
                                           :function ,(with-gensyms (lambda-arguments lambda-next-methods)
                                                                    `(lambda (,lambda-arguments ,lambda-next-methods)
                                                                       (when ,lambda-next-methods ,(next-method-helper gf lambda-arguments lambda-next-methods))

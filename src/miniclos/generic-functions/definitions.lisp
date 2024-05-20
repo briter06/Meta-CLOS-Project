@@ -55,20 +55,28 @@
   (loop for method in methods
           when (let ((specializers (method-specializers method)))
                  (and (eql (length specializers) (length arguments))
-                      (every (lambda (s) (instancep (cadr s) (car s))) (zip specializers arguments))))
+                      (every (lambda (s)
+                               (if (listp (car s))
+                                   (cond
+                                    ((eql (car (car s)) 'eql) (eql (symbol-value (cadr (car s))) (cadr s)))
+                                    (t (error "Invalid specializer")))
+                                   (instancep (cadr s) (symbol-value (car s))))) (zip specializers arguments))))
         collect method))
 
-(defun is-more-specific? (main-class class1 class2)
-  (let ((precedence-list (class-precedence-list main-class)))
-    (< (position (class-name-symbol class1) precedence-list) (position (class-name-symbol class2) precedence-list))))
+(defun is-more-specific? (main-class specializer1 specializer2)
+  (cond
+   ((listp specializer1) t)
+   ((listp specializer2) nil)
+   (t (let ((precedence-list (class-precedence-list main-class)))
+        (< (position specializer1 precedence-list) (position specializer2 precedence-list))))))
 
 (defun is-more-specific-list? (arguments specializers1 specializers2)
   (let ((main-class (object-class (car arguments)))
-        (class1 (car specializers1))
-        (class2 (car specializers2)))
+        (specializer1 (car specializers1))
+        (specializer2 (car specializers2)))
     (cond
-     ((eql class1 class2) (is-more-specific-list? (cdr arguments) (cdr specializers1) (cdr specializers2)))
-     (t (is-more-specific? main-class class1 class2)))))
+     ((eql specializer1 specializer2) (is-more-specific-list? (cdr arguments) (cdr specializers1) (cdr specializers2)))
+     (t (is-more-specific? main-class specializer1 specializer2)))))
 
 (defun select-most-specific-method (arguments methods)
   (loop with candidate = (first methods)

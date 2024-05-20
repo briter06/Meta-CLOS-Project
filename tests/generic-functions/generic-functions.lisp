@@ -97,4 +97,24 @@
 
 (unbound-variables '(<animal> <dog> <food> <apple> display))
 
+;; Scenario 4 | EQL specializer
+
+(defclass city () (population))
+(defvar paris (make-instance 'city))
+(setf (slot-value paris 'population) 2.161)
+(defvar brussels (make-instance 'city))
+(setf (slot-value brussels 'population) 1.209)
+
+(defgeneric population (city))
+
+(defmethod population ((city city))
+  (slot-value city 'population))
+
+(defmethod population ((city (eql brussels)))
+  (declare (ignore city))
+  0)
+
+(assert-equals (population paris) 2.161)
+(assert-equals (population brussels) 0)
+
 (format t "Generic Functions => All the tests passed~%")
