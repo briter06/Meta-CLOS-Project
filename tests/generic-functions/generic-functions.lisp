@@ -55,10 +55,45 @@
 (defmethod display ((dog dog) (food food))
   (declare (ignore dog))
   (declare (ignore food))
-  "Method 2")
+  (concatenate 'string "Method 2 -> " (call-next-method)))
 
-(assert-equals (display (make-instance 'dog) (make-instance 'apple)) "Method 2")
+(defmethod display ((dog dog) (food apple))
+  (declare (ignore dog))
+  (declare (ignore food))
+  (concatenate 'string "Method 3 -> " (call-next-method)))
+
+(assert-equals (display (make-instance 'dog) (make-instance 'apple)) "Method 3 -> Method 2 -> Method 1")
 (assert-equals (display (make-instance 'animal) (make-instance 'apple)) "Method 1")
+
+(unbound-variables '(<animal> <dog> <food> <apple> display))
+
+;; Scenario 3 | Inner precedence 2
+
+(defclass animal () ())
+(defclass dog (animal) ())
+
+(defclass food () ())
+(defclass apple (food) ())
+
+(defclass person () ())
+(defclass student (person) ())
+
+(defgeneric display (animal food person))
+
+(defmethod display ((dog dog) (apple apple) (person person))
+  (declare (ignore dog))
+  (declare (ignore apple))
+  (declare (ignore person))
+  "Method 1")
+
+(defmethod display ((dog dog) (apple apple) (student student))
+  (declare (ignore dog))
+  (declare (ignore apple))
+  (declare (ignore student))
+  (concatenate 'string "Method 2 -> " (call-next-method)))
+
+(assert-equals (display (make-instance 'dog) (make-instance 'apple) (make-instance 'student)) "Method 2 -> Method 1")
+(assert-equals (display (make-instance 'dog) (make-instance 'apple) (make-instance 'person)) "Method 1")
 
 (unbound-variables '(<animal> <dog> <food> <apple> display))
 
