@@ -12,7 +12,7 @@
 
 (defvar counter 0)
 
-(defgeneric squared (x) (:cached t))
+(defgeneric squared (x) (:cached))
 (defmethod squared (x)
   (setf counter (+ 1 counter))
   (* (slot-value x 'value) (slot-value x 'value)))

@@ -52,7 +52,7 @@
 (format t "Argument Precedence Order | Different order => Start testing~%")
 (format t "~%")
 
-(defgeneric display-diff-order (a f l) (:argument-precedence-order (l a f)))
+(defgeneric display-diff-order (a f l) (:argument-precedence-order l a f))
 
 (defmethod display-diff-order ((a animal) (ap apple) (l location))
   (declare (ignore a))

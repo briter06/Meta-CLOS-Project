@@ -8,9 +8,13 @@
     `(progn
       (defvar ,name (make-generic-function
                      :argument-precedence-order
-                     ',(get-positions (car all-arguments) (or (getf (cadr all-arguments) :argument-precedence-order) (car all-arguments))))))
+                     ',(get-positions
+                        (car all-arguments)
+                        (or
+                         (cdr (assoc :argument-precedence-order (cdr all-arguments)))
+                         (car all-arguments))))))
     (cond
-     ((getf (cadr all-arguments) :cached)
+     ((assoc :cached (cdr all-arguments))
        (let ((args-cache (cons 'list (car all-arguments))))
          `((defmethod ,name :around ,(mapcar (lambda (x) `(,x *object*)) (car all-arguments))
              (or (get-from-cache ,name ,args-cache)
