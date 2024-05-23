@@ -40,7 +40,7 @@
 (defclass apple (fruit) ())
 (defclass new-class (fruit apple) ())
 
-(assert-should-raise (class-precedence-list (find-class 'new-class)) predecence-list-error "There is a cycle in the precedence list")
+(assert-should-raise-simple-error (class-precedence-list (find-class 'new-class)) "There is a cycle in the precedence list")
 
 (unbound-variables '(<new-class> <apple> <fruit> <food>))
 

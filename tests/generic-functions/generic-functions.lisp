@@ -18,13 +18,13 @@
 
 (defgeneric display (object))
 
-(assert-should-raise (defmethod display ((person person) arg2) t) generic-function-error "Invalid number of arguments: 2")
+(assert-should-raise-simple-error (defmethod display ((person person) arg2) t) "Invalid number of arguments: 2")
 
 (defmethod display ((person person))
   (declare (ignore person))
-  (error 'generic-function-error :message "This method should be overriden"))
+  (error "This method should be overriden"))
 
-(assert-should-raise (display person-obj) generic-function-error "This method should be overriden")
+(assert-should-raise-simple-error (display person-obj) "This method should be overriden")
 
 (defmethod display ((person person))
   `(,(slot-value person 'name) ,(slot-value person 'address)))

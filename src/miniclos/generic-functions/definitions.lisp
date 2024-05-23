@@ -2,9 +2,6 @@
 (load "src/utils/lists.lisp")
 (load "src/miniclos/precedence-list/precedence-list.lisp")
 
-(define-condition generic-function-error (error)
-    ((message :initarg :message :reader message)))
-
 (defstruct generic-function
   (methods '())
   (before-methods '())

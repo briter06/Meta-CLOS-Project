@@ -3,9 +3,6 @@
 
 ;; Predecence list
 
-(define-condition predecence-list-error (error)
-    ((message :initarg :message :reader message)))
-
 (defun generate-class-symbol-set (class)
   (mapcar #'class-name-symbol (class-all-superclasses class)))
 
@@ -38,7 +35,7 @@
 (defun detect-superclass (candidates acc)
   (cond
    ((eql (length candidates) 1) (car candidates))
-   ((eql (length acc) 0) (error 'predecence-list-error :message "There is a cycle in the precedence list"))
+   ((eql (length acc) 0) (error "There is a cycle in the precedence list"))
    (t (let ((superclass (get-superclass-of-subclass-in-list (symbol-value (car acc)) candidates)))
         (or superclass (detect-superclass candidates (cdr acc)))))))
 
@@ -47,7 +44,7 @@
       acc
       (let ((candidates (classes-not-preceded s r)))
         (if
-         (eql (length candidates) 0) (error 'predecence-list-error :message "There is a cycle in the precedence list")
+         (eql (length candidates) 0) (error "There is a cycle in the precedence list")
          (let ((elem (detect-superclass candidates acc)))
            (precedence-list-accumulator (remove-from-set elem s) (remove-apperance-of-class elem r) (cons elem acc)))))))
 

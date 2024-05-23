@@ -3,14 +3,14 @@
     ((equal ,x ,y) t)
     (t (error (format nil "Assert error in (assert-equals ~d ~d) = Received: ~d | Expected: ~d~%" ',x ',y ,x ,y)))))
 
-(defmacro assert-should-raise (x error-type error-message)
+(defmacro assert-should-raise-simple-error (x error-message)
   `(handler-case ,x
-     (,error-type (e)
-       (assert-equals (message e) ,error-message))
+     (simple-error (e)
+                   (assert-equals (format nil "~a" e) ,error-message))
      (error (e)
-       (error (format nil "Assert error in (assert-should-raise ~d ~d ~d) | Incorrect error was raised. Received error: ~d" ',x ',error-type ',error-message e)))
+       (error (format nil "Assert error in (assert-should-raise-simple-error ~d ~d) | Incorrect error was raised. Received error: ~d" ',x ',error-message e)))
      (:no-error (res) (declare (ignore res))
-                (error (format nil "Assert error in (assert-should-raise ~d ~d ~d) | Execution did not raise any errors" ',x ',error-type ',error-message)))))
+                (error (format nil "Assert error in (assert-should-raise-simple-error ~d ~d) | Execution did not raise any errors" ',x ',error-message)))))
 
 (defun unbound-variables (variables)
   (loop for variable in variables do (makunbound variable) finally (return t)))

@@ -45,7 +45,7 @@
                        (funcall (method-function ,next-most-specific-method)
                          ,arguments
                          (remove ,next-most-specific-method ,next-methods))
-                       (error 'generic-function-error :message "There is no available next method")))))
+                       (error "There is no available next method")))))
 
 (defun next-method-around (gf arguments next-methods)
   `(if ,next-methods
@@ -57,7 +57,7 @@
         (num-args (arguments-length (symbol-value gf))))
     (cond
      ((not (eql new-num-args num-args))
-       `(error 'generic-function-error :message (format nil "Invalid number of arguments: ~d" ,new-num-args)))
+       `(error (format nil "Invalid number of arguments: ~d" ,new-num-args)))
      (t function-body))))
 
 (defun gen-let (variable-names lambda-arguments body)
