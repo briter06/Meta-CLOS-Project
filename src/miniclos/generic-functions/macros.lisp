@@ -52,49 +52,47 @@
        ,(next-method-helper gf arguments next-methods)
        (call-main-generic-function ,gf ,arguments)))
 
-(defun defmethod-helper (gf arguments function-body)
+(defun argument-num-checker (gf arguments)
   (let ((new-num-args (length arguments))
         (num-args (arguments-length (symbol-value gf))))
-    (cond
-     ((not (eql new-num-args num-args))
-       `(error (format nil "Invalid number of arguments: ~d" ,new-num-args)))
-     (t function-body))))
+    (when (not (eql new-num-args num-args))
+          (error (format nil "Invalid number of arguments: ~d" new-num-args)))))
 
 (defun gen-let (variable-names lambda-arguments body)
   (append `(let ,(loop for variable-name in variable-names for index from 0 collect `(,variable-name (nth ,index ,lambda-arguments)))) body))
 
 (defun defmethod-normal (method-symbol next-method-symbol gf arguments body)
-  (defmethod-helper gf arguments
-                    (let ((args-mapper (extract-specializers-variables arguments)))
-                      `(,method-symbol ,gf
-                         (make-method
-                          :specializers ',(cadr args-mapper)
-                          :function ,(with-gensyms (lambda-arguments lambda-next-methods)
-                                                   `(lambda (,lambda-arguments ,lambda-next-methods)
-                                                      (labels ((call-next-method () ,(funcall next-method-symbol gf lambda-arguments lambda-next-methods)))
-                                                        ,(gen-let (car args-mapper) lambda-arguments body)))))))))
+  (argument-num-checker gf arguments)
+  (let ((args-mapper (extract-specializers-variables arguments)))
+    `(,method-symbol ,gf
+       (make-method
+        :specializers ',(cadr args-mapper)
+        :function ,(with-gensyms (lambda-arguments lambda-next-methods)
+                                 `(lambda (,lambda-arguments ,lambda-next-methods)
+                                    (labels ((call-next-method () ,(funcall next-method-symbol gf lambda-arguments lambda-next-methods)))
+                                      ,(gen-let (car args-mapper) lambda-arguments body))))))))
 
 (defun defmethod-before (gf arguments body)
-  (defmethod-helper gf arguments
-                    (let ((args-mapper (extract-specializers-variables arguments)))
-                      `(add-before-method ,gf
-                                          (make-method
-                                           :specializers ',(cadr args-mapper)
-                                           :function ,(with-gensyms (lambda-arguments lambda-next-methods)
-                                                                    `(lambda (,lambda-arguments ,lambda-next-methods)
-                                                                       ,(gen-let (car args-mapper) lambda-arguments body)
-                                                                       (when ,lambda-next-methods ,(next-method-helper gf lambda-arguments lambda-next-methods)))))))))
+  (argument-num-checker gf arguments)
+  (let ((args-mapper (extract-specializers-variables arguments)))
+    `(add-before-method ,gf
+                        (make-method
+                         :specializers ',(cadr args-mapper)
+                         :function ,(with-gensyms (lambda-arguments lambda-next-methods)
+                                                  `(lambda (,lambda-arguments ,lambda-next-methods)
+                                                     ,(gen-let (car args-mapper) lambda-arguments body)
+                                                     (when ,lambda-next-methods ,(next-method-helper gf lambda-arguments lambda-next-methods))))))))
 
 (defun defmethod-after (gf arguments body)
-  (defmethod-helper gf arguments
-                    (let ((args-mapper (extract-specializers-variables arguments)))
-                      `(add-after-method ,gf
-                                         (make-method
-                                          :specializers ',(cadr args-mapper)
-                                          :function ,(with-gensyms (lambda-arguments lambda-next-methods)
-                                                                   `(lambda (,lambda-arguments ,lambda-next-methods)
-                                                                      (when ,lambda-next-methods ,(next-method-helper gf lambda-arguments lambda-next-methods))
-                                                                      ,(gen-let (car args-mapper) lambda-arguments body))))))))
+  (argument-num-checker gf arguments)
+  (let ((args-mapper (extract-specializers-variables arguments)))
+    `(add-after-method ,gf
+                       (make-method
+                        :specializers ',(cadr args-mapper)
+                        :function ,(with-gensyms (lambda-arguments lambda-next-methods)
+                                                 `(lambda (,lambda-arguments ,lambda-next-methods)
+                                                    (when ,lambda-next-methods ,(next-method-helper gf lambda-arguments lambda-next-methods))
+                                                    ,(gen-let (car args-mapper) lambda-arguments body)))))))
 
 (defmacro defmethod (gf &rest all-arguments)
   (let ((first (car all-arguments))

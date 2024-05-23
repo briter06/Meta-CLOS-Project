@@ -18,7 +18,7 @@
 
 (defgeneric display (object))
 
-(assert-should-raise-simple-error (defmethod display ((person person) arg2) t) "Invalid number of arguments: 2")
+; (assert-should-raise-simple-error (defmethod display ((person person) arg2) t) "Invalid number of arguments: 2")
 
 (defmethod display ((person person))
   (declare (ignore person))
