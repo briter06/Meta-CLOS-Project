@@ -1,0 +1,161 @@
+Precedence List => All the tests passed
+Generic Functions => All the tests passed
+Auxiliary Methods => All the tests passed
+
+============== ASSIGNMENT EXAMPLES ====================
+
+AUXILIARY METHODS:
+
+Auxiliary Methods | Assignment example | Square => Start testing
+
+  (DEFVAR NUM (MAKE-INSTANCE 'NUMBER))
+  > NUM
+
+  (SETF (SLOT-VALUE NUM 'VALUE) 5)
+  > 5
+
+  (SQUARE NUM)
+  > About to calculate the square of 5
+  > Just calculated the square of 5
+  > 25
+
+Auxiliary Methods | Assignment example | Square => All the tests passed
+
+Auxiliary Methods | Assignment example | Multiply => Start testing
+
+  (DEFVAR NUM1 (MAKE-INSTANCE 'NUMBER))
+  > NUM1
+
+  (SETF (SLOT-VALUE NUM1 'VALUE) 3)
+  > 3
+
+  (DEFVAR NUM2 (MAKE-INSTANCE 'NUMBER))
+  > NUM2
+
+  (SETF (SLOT-VALUE NUM2 'VALUE) 5)
+  > 5
+
+  (MULTIPLY NUM1 NUM2)
+  > Before multiplying
+  > After multiplying
+  > 15
+
+Auxiliary Methods | Assignment example | Multiply => All the tests passed
+----------------------------------------------------------------------------------
+
+MULTIPLE DISPATCH:
+
+Multiple Dispatch | Assignment example | Animals => Start testing
+
+  (EAT *MY-DOG* *DOG-FOOD*)
+  > I like dog food!
+
+  (EAT *MY-CAT* *CAT-FOOD*)
+  > I like cat food!
+
+  (EAT *MY-DOG* *CAT-FOOD*)
+  > I cannot eat cat food
+
+  (EAT *MY-CAT* *DOG-FOOD*)
+  > I cannot eat this food
+
+  (EAT *MY-CAT* *MY-PIG*)
+  > What you are giving me is not food
+
+Multiple Dispatch | Assignment example | Animals => All the tests passed
+----------------------------------------------------------------------------------
+
+MULTIPLE INHERITANCE:
+
+Multiple Inheritance | Assignment example | Students => Start testing
+
+  (STUDY PHDSTUDENT)
+  > Let's study.
+
+  (STUDY PERSON)
+  > I'm not a student.
+
+  (STUDY STAFF)
+  > I work with students, but I'm not a student.
+
+  (GREET PHDSTUDENT)
+  > Let's research! Deadlines? Deadlines! Time is ticking. How are you?
+
+Multiple Inheritance | Assignment example | Students => All the tests passed
+----------------------------------------------------------------------------------
+
+
+============== ADDITIONAL REQUIREMENTS ====================
+
+CACHE:
+
+Cache | Squared => Start testing
+
+  (DEFVAR NUM (MAKE-INSTANCE 'NUMBER))
+  > NUM
+
+  (SETF (SLOT-VALUE NUM 'VALUE) 5)
+  > 5
+
+  (SQUARED NUM)
+  > 25
+
+  (SQUARED NUM)
+  > 25
+
+  COUNTER
+  > 1
+
+Cache | Squared => All the tests passed
+----------------------------------------------------------------------------------
+
+EQL SPECIALIZER:
+
+EQL Specializer | Animals => Start testing
+
+  (DISPLAY-EQL (MAKE-INSTANCE 'DOG) (MAKE-INSTANCE 'APPLE)
+               (MAKE-INSTANCE 'STUDENT))
+  > Method 2 -> Method 1
+
+  (DISPLAY-EQL (MAKE-INSTANCE 'DOG) (MAKE-INSTANCE 'APPLE)
+               (MAKE-INSTANCE 'PERSON))
+  > Method 1
+
+  (DISPLAY-EQL (MAKE-INSTANCE 'DOG) *SUPER-APPLE* (MAKE-INSTANCE 'PERSON))
+  > Super Apple Method -> Method 1
+
+  (DISPLAY-EQL (MAKE-INSTANCE 'DOG) (MAKE-INSTANCE 'APPLE) *SUPER-PERSON*)
+  > Super Person Method -> Method 1
+
+  (DISPLAY-EQL (MAKE-INSTANCE 'DOG) *SUPER-APPLE* *SUPER-PERSON*)
+  > Super Apple Method -> Super Person Method -> Method 1
+
+EQL Specializer | Animals => All the tests passed
+----------------------------------------------------------------------------------
+
+ARGUMENT PRECEDENCE ORDER:
+
+Argument Precedence Order | Default order => Start testing
+
+  (DISPLAY-ORDER (MAKE-INSTANCE 'DOG) (MAKE-INSTANCE 'APPLE)
+                 (MAKE-INSTANCE 'CITY))
+  > Method 2 -> Method 1
+
+  (DISPLAY-ORDER (MAKE-INSTANCE 'DOG) (MAKE-INSTANCE 'APPLE)
+                 (MAKE-INSTANCE 'LOCATION))
+  > Method 2 -> Method 1
+
+Argument Precedence Order | Default order => All the tests passed
+
+Argument Precedence Order | Different order => Start testing
+
+  (DISPLAY-DIFF-ORDER (MAKE-INSTANCE 'DOG) (MAKE-INSTANCE 'APPLE)
+                      (MAKE-INSTANCE 'CITY))
+  > Method 3 -> Method 2 -> Method 1
+
+  (DISPLAY-DIFF-ORDER (MAKE-INSTANCE 'DOG) (MAKE-INSTANCE 'APPLE)
+                      (MAKE-INSTANCE 'LOCATION))
+  > Method 2 -> Method 1
+
+Argument Precedence Order | Different order => All the tests passed
+----------------------------------------------------------------------------------
