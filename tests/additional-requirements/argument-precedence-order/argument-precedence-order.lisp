@@ -14,7 +14,7 @@
 (format t "ARGUMENT PRECEDENCE ORDER:~%")
 (format t "~%")
 
-;; Scenario 2 | Different order
+;; Scenario 1 | The generic function follows the standard argument precedence order
 
 (format t "Argument Precedence Order | Default order => Start testing~%")
 (format t "~%")
@@ -47,7 +47,7 @@
 (format t "Argument Precedence Order | Default order => All the tests passed~%")
 (format t "~%")
 
-;; Scenario 2 | Different order
+;; Scenario 2 | The generic function follows a custom argument precedence order
 
 (format t "Argument Precedence Order | Different order => Start testing~%")
 (format t "~%")

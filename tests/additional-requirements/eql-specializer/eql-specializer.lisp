@@ -8,24 +8,24 @@
 ;; Scenario 1 | EQL specializer
 
 (defclass city () (population))
-(defvar paris (make-instance 'city))
-(setf (slot-value paris 'population) 2.161)
-(defvar brussels (make-instance 'city))
-(setf (slot-value brussels 'population) 1.209)
+(defvar *paris* (make-instance 'city))
+(setf (slot-value *paris* 'population) 2.161)
+(defvar *brussels* (make-instance 'city))
+(setf (slot-value *brussels* 'population) 1.209)
 
 (defgeneric population (city))
 
 (defmethod population ((city city))
   (slot-value city 'population))
 
-(defmethod population ((city (eql brussels)))
+(defmethod population ((city (eql *brussels*)))
   (declare (ignore city))
   0)
 
-(assert-equals (population paris) 2.161)
-(assert-equals (population brussels) 0)
+(assert-equals (population *paris*) 2.161)
+(assert-equals (population *brussels*) 0)
 
-(unbound-variables '(<city> paris brussels population))
+(unbound-variables '(<city> *paris* *brussels* population))
 
 ;; Scenario 2 | EQL specializer 2
 

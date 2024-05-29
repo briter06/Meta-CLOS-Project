@@ -59,7 +59,7 @@
                   `(,(cons tuple objects) ,(cons '*object* specializers)))))
       (reverse arguments) :initial-value '(() ())))
 
-;; Function to call the next most specific method, based on the next-methods list
+;; Function that generates the code to call the next most specific method, based on the next-methods list
 (defun next-method-helper (gf arguments next-methods)
   ;; Use gensym so the name of the variable is unique and it doesn't create a conflict with the variables used by the developer
   (with-gensyms (next-most-specific-method)
@@ -72,7 +72,8 @@
                        ;; If not, signal an error
                        (error "There is no available next method")))))
 
-;; Function to call the next most specific method only if there is one, if not, call the main generic function (primary method + "before" and "after" methods)
+;; Function that generates the code to call the next most specific method only if there is one
+;; If not, call the main generic function (primary method + "before" and "after" methods)
 (defun next-method-around (gf arguments next-methods)
   `(if ,next-methods
        ;; If there are more methods to run, use the regular process
@@ -88,11 +89,11 @@
           ;; Signal an error if the number of arguments is not equal
           (error (format nil "Invalid number of arguments: ~d" new-num-args)))))
 
-;; Generate the let expression for binding the elements in the list of arguments with the variable names defined by the developer
+;; Function that generates the code for the let expression for binding the elements in the list of arguments with the variable names defined by the developer
 (defun gen-let (variable-names lambda-arguments body)
   (append `(let ,(loop for variable-name in variable-names for index from 0 collect `(,variable-name (nth ,index ,lambda-arguments)))) body))
 
-;; Function for creating a primary method for a generic function
+;; Function that generates the code for creating a primary method for a generic function
 ;; Also used for the "around" auxiliary methods
 (defun defmethod-normal (method-symbol next-method-symbol gf arguments body)
   ;; Verify the number of arguments
@@ -113,7 +114,7 @@
                                       ;; Bind the variables and inject the body of the method
                                       ,(gen-let (car args-mapper) lambda-arguments body))))))))
 
-;; Function for creating a "before" auxiliary method
+;; Function that generates the code for creating a "before" auxiliary method
 (defun defmethod-before (gf arguments body)
   ;; Verify the number of arguments
   (argument-num-checker gf arguments)
@@ -135,7 +136,7 @@
                                                      ;; It calls from the most specific to the least specific
                                                      (when ,lambda-next-methods ,(next-method-helper gf lambda-arguments lambda-next-methods))))))))
 
-;; Function for creating an "after" auxiliary method
+;; Function that generates the code for creating an "after" auxiliary method
 (defun defmethod-after (gf arguments body)
   ;; Verify the number of arguments
   (argument-num-checker gf arguments)
@@ -157,7 +158,7 @@
                                                     ;; Bind the variables and inject the body of the method
                                                     ,(gen-let (car args-mapper) lambda-arguments body)))))))
 
-;; Macro fro creating a method for a generic function
+;; Macro for creating a method for a generic function
 (defmacro defmethod (gf &rest all-arguments)
   ;; first -> First argument of the macro
   ;; rest -> Other arguments
